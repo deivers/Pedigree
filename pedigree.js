@@ -1,42 +1,33 @@
-// requires jQuery
 
-var pedigree;
+var pedigree = {};
 var pm;
 
-// var requiredScripts = [
-// 	"utility.js",
-// 	"IndividualModel.js"
-// ];
+pedigree.constants = {
+	DOMINANT_AUTOSOMAL: 0,
+	RECESSIVE_AUTOSOMAL: 1,
+	DOMINANT_SEXLINKED: 2,
+	RECESSIVE_SEXLINKED: 3,
+	// graphic parameters
+	SYMBOL_SIZE: 8,
+	LINE_THICKNESS: 2,
+	// IndividualModel
+	DOMINANT: 1,
+	EMPTY: 0,
+	RECESSIVE: -1,
+	X_ALLELE: 0,
+	Y_ALLELE: 1
 
-// $.when.apply(null, requiredScripts.map(function(filePath) {
-// 	console.log(filePath)
-//     return $.getScript(filePath);
-// }))
-// .done(function( script, textStatus ) { console.log("this should only print out once......."); })
-// .fail(function( jqxhr, settings, exception ) { console.log("FAILED to load scrips") });
+};
 
-$.getScript("IndividualModel.js", function(){
 
-	if (!exists(pedigree))
-		pedigree = {};
-	if (!exists(pedigree.constants))
-		pedigree.constants = {
-			DOMINANT_AUTOSOMAL: 0,
-			RECESSIVE_AUTOSOMAL: 1,
-			DOMINANT_SEXLINKED: 2,
-			RECESSIVE_SEXLINKED: 3,
-			// graphic parameters
-			SYMBOL_SIZE: 8,
-			LINE_THICKNESS: 2
-		};
+$.getScript("utility.js", function(){
 
-	 // test
-	debug("utility script successfully loaded");
-	pm = new PedigreeModel();
-	debug(pm.traitType);
 	debug(pedigree.constants.SYMBOL_SIZE);
+	pm = new PedigreeModel(pedigree.constants.DOMINANT_SEXLINKED, 0, 0, 5, 1);
+	debug(pm.traitType);
 
 });
+
 
 function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand) {
 	this.traitType = traittype;
@@ -65,7 +56,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		createParentsSexlinked(pairTypeGen1);
 	}
 
-	this.children = new IndividualModel(numChild);
+	this.children = [];
 	// create first generation
 	for (var i = 0; i < numChild; i++) {
 		this.children[i] = birth(this.fatherGen1, this.motherGen1);
@@ -84,7 +75,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	}
 	if (this.whichChildPairsWithInlaw == -1) // the above wasn't successful, so just pick the first
 		this.whichChildPairsWithInlaw = 0;
-	if (this.children[whichChildPairsWithInlaw].isMale())
+	if (this.children[this.whichChildPairsWithInlaw].isMale())
 		this.inlaw = motherGen2prefered;
 	else
 		this.inlaw = fatherGen2prefered;
@@ -264,7 +255,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		return this.pairing;
 	}
 
-	var birth = function(father, mother) {
+	function birth(father, mother) {
 		var toggle = Math.round(Math.random()); // 0 or 1
 		var male = (toggle == 1);
 		var a2 = father.getAllele(toggle);
@@ -297,24 +288,149 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 } // end of PedigreeModel
 
 
-// function loadScript(url, callback) {
-//     // @todo if url is an array, load each element///////////
-//     var head = document.getElementsByTagName('head')[0];
-//     var script = document.createElement('script');
-//     script.type = 'text/javascript';
-//     script.src = url;
-//     script.onreadystatechange = callback;
-//     script.onload = callback;
-//     head.appendChild(script);
-// }
+function IndividualModel(m, a1, a2) {
+	if (a1 == pedigree.constants.EMPTY) alert("Invalid arguments sent to function IndividualModel");
+	if (!m && a2 == pedigree.constants.EMPTY) alert("Invalid arguments sent to function IndividualModel");
+	///if (a1 == pedigree.constants.RECESSIVE && a2 == pedigree.constants.DOMINANT) alert("Invalid arguments sent to function IndividualModel");
 
-function run() {
-	// test
-	debug("utility script successfully loaded");
-	var p = new PedigreeModel();
-	debug(p.traitType);
-	debug(p.c.SYMBOL_SIZE);
-};
-// loadScript("utility.js", run);
+	this.male = m;		// false selected for female because of common initial letter
+	this.allele1 = a1;
+	this.allele2 = a2;
 
 
+	this.isMale = function() {
+		return male;
+	}
+
+	this.isTraitVisible = function(isDominant) {
+		// the only way for a recessive trait to appear is to have:
+		// both alleles recessive, or one allele recessive and the other empty
+		if (typeof isDominant === "boolean") {
+			if (isDominant)
+				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
+			else
+				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+		} else {
+			if (isDominant == pedigree.constants.RECESSIVE)
+				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+			else			// dominant
+				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
+		}
+	};
+
+	// Gets one of the alleles.  Use this to generate children according to the Punnett Square.
+	// @return DOMINANT, EMPTY, OR RECESSIVE
+	this.getAllele = function(whichN) {
+		if (whichN == pedigree.constants.X_ALLELE)
+			return allele1;
+		else
+			return allele2;
+	}
+
+	// For our purposes, two individuals are equal if they have the same alleles
+	// Optionally, this will also check the individual's gender
+	this.equals = function(individualModel, checkGender) {
+		// if gender not the same, then false
+		if (checkGender) {
+			if (this.isMale() != individualModel.isMale())
+				return false;
+		}
+		if (this.getAllele(1)==individualModel.getAllele(1) && this.getAllele(2)==individualModel.getAllele(2))
+			return true;
+		else if (this.getAllele(1)==individualModel.getAllele(2) && this.getAllele(2)==individualModel.getAllele(1))
+			return true;
+		else
+			return false;
+	}
+
+	this.toString = function() {
+		result = "";
+		if (male)
+			result += "Male ";
+		else
+			result += "Female ";
+		switch(allele1) {
+			case pedigree.constants.DOMINANT:
+				result += "Dominant ";
+				break;
+			case pedigree.constants.RECESSIVE:
+				result += "Recessive ";
+				break;
+		}
+		switch(allele2) {
+			case pedigree.constants.DOMINANT:
+				result += "Dominant";
+				break;
+			case pedigree.constants.RECESSIVE:
+				result += "Recessive";
+				break;
+			case pedigree.constants.EMPTY:
+				result += "Empty";
+		}
+		return result;
+	}
+}
+
+
+
+function GenderSymbol(x, y, size, filled, lineW, gender) {
+
+	this.c = {
+		RADIUS_RATIO: 1.8,	// controls how long the radial line is as a ratio of circle radius
+		SPREAD_RATIO: 0.75	// controls how big the arrow and crossbar are as a ratio of circle radius
+	};
+
+	this.xCenter = Math.abs(x);
+	this.yCenter = Math.abs(y);
+	this.size = (size > 4) ? size : 5;
+	this.filled = filled;
+	this.lineWidth = (lineW < 1) ? 1 : lineW;
+	this.gender = gender;
+	this.c = Color.getHSBColor(0, 0, 0); // black line and fill color
+
+	var xCenter;
+	var yCenter;
+	var size;		// radius of the circle
+	var filled;
+	var color;
+	var lineWidth;
+	var gender;
+
+
+	function draw(snapSvgContainer) {
+		var halfLineW = Math.floor(lineWidth * 0.0); // was 0.5
+		var xOval = xCenter - size - lineWidth + 1;
+		var yOval = yCenter - size - lineWidth;
+		var xFill = xCenter - size - halfLineW - 1;
+		var yFill = yCenter - size - halfLineW - 2;
+		var l1 = Math.round(size * RADIUS_RATIO);
+		var l2 = Math.round(size * SPREAD_RATIO);
+		// anti-alias
+		snapSvgContainer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		snapSvgContainer.setColor(c);
+		snapSvgContainer.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		// draw the lines that make up the male and female symbols
+		if (gender) { // true: male
+			snapSvgContainer.drawLine(xCenter, yCenter, xCenter + l1, yCenter - l1);
+			snapSvgContainer.drawLine(xCenter + l1 - l2, yCenter - l1, xCenter + l1, yCenter - l1);
+			snapSvgContainer.drawLine(xCenter + l1, yCenter - l1, xCenter + l1, yCenter - (l1 - l2));
+		} else { // false: female
+			snapSvgContainer.drawLine(xCenter, yCenter, xCenter, yCenter + l1 + l2);
+			snapSvgContainer.drawLine(xCenter - l2, yCenter + l1, xCenter + l2, yCenter + l1);
+		}
+		// draw the filling of the circle
+		if (filled)
+			snapSvgContainer.setColor(c);
+		else
+			snapSvgContainer.setColor(Color.getHSBColor(0, 0, 1)); // white, hides the line inside the oval
+		///snapSvgContainer.setColor(Color.RED);  						// for testing
+		snapSvgContainer.setStroke(new BasicStroke(0));
+		snapSvgContainer.fillOval(xFill, yFill, size * 2 + lineWidth, size * 2 + lineWidth);
+		// draw the outline of the circle if white fill
+		if (!filled) {
+			snapSvgContainer.setColor(c);  // outline is black even if fill is white
+			snapSvgContainer.setStroke(new BasicStroke(lineWidth));
+			snapSvgContainer.drawOval(xOval, yOval, size * 2 + lineWidth, size * 2 + lineWidth);
+		}
+	}
+}

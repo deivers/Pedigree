@@ -16,12 +16,10 @@ pedigree.constants = {
 	RECESSIVE: -1,
 	X_ALLELE: 0,
 	Y_ALLELE: 1
-
 };
 
 
 $.getScript("utility.js", function(){
-
 	debug(pedigree.constants.SYMBOL_SIZE);
 	pm = new PedigreeModel(pedigree.constants.DOMINANT_SEXLINKED, 0, 0, 5, 1);
 	debug(pm.traitType);
@@ -84,7 +82,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	// create second generation
 	var fatherGen2;
 	var motherGen2;
-	if (inlaw.isMale()) {
+	if (this.inlaw.isMale()) {
 		fatherGen2 = this.inlaw;
 		motherGen2 = this.children[this.whichChildPairsWithInlaw];
 	} else {
@@ -95,6 +93,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		this.grandchildren[i] = birth(fatherGen2, motherGen2);
 	}
 
+	// private function
 	function createParentsAutosomal(that, parentType) {
 		switch (parentType) {
 			case 0: // BB BB
@@ -144,6 +143,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		}
 	}
 
+	// private function
 	function createParentsSexlinked(that, parentType) {
 		switch (parentType) {
 			case 0: // XBXB XBy
@@ -179,8 +179,42 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		}
 	}
 
+	// private method
+	function birth(father, mother) {
+		var toggle = Math.round(Math.random()); // 0 or 1
+		var male = (toggle == 1);
+		var a2 = father.getAllele(toggle);
+		var a1 = mother.getAllele(Math.round(Math.random()));
+		return new IndividualModel(male, a1, a2);
+	}
 
-	this.draw = function(snap) {
+	// Returns a description of the current pedigree, used for debugging only
+	this.toString = function() {
+		result = "";
+		result += "*Father: " + this.fatherGen1.toString();
+		result += "\n";
+		result += "*Mother: " + this.motherGen1.toString();
+		result += "\n";
+		for (var i = 0; i < this.children.length; i++) {
+			if (i == this.whichChildPairsWithInlaw)
+				result += "*";
+			result += this.children[i].toString();
+			result += "\n";
+		}
+		result += "*Inlaw: " + this.inlaw.toString();
+		result += "\n";
+		for (var i = 0; i < this.grandchildren.length; i++) {
+			result += this.grandchildren[i].toString();
+			result += "\n";
+		}
+		return result;
+	}
+
+}
+PedigreeModel.prototype.draw = function(snapCanvas) {
+		console.log("draw function");
+		debugger///
+
 		// this code uses Snap.svg //
 		var gridX = 40;
 		var gridY = 60;
@@ -246,47 +280,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, grandchildren[i].isMale());
 			grand.draw(snap);
 		}
-
-	};
-
-
-	// Returns the father and mother pairing of the first generation
-	// @return  string description of the pairing
-	var getPairing = function() {
-		return this.pairing;
-	}
-
-	function birth(father, mother) {
-		var toggle = Math.round(Math.random()); // 0 or 1
-		var male = (toggle == 1);
-		var a2 = father.getAllele(toggle);
-		var a1 = mother.getAllele(Math.round(Math.random()));
-		return new IndividualModel(male, a1, a2);
-	}
-
-	// Returns a description of the current pedigree, used for debugging only
-	var toString = function() {
-		result = "";
-		result += "*Father: " + this.fatherGen1.toString();
-		result += "\n";
-		result += "*Mother: " + this.motherGen1.toString();
-		result += "\n";
-		for (var i = 0; i < this.children.length; i++) {
-			if (i == this.whichChildPairsWithInlaw)
-				result += "*";
-			result += this.children[i].toString();
-			result += "\n";
-		}
-		result += "*Inlaw: " + this.inlaw.toString();
-		result += "\n";
-		for (var i = 0; i < this.grandchildren.length; i++) {
-			result += this.grandchildren[i].toString();
-			result += "\n";
-		}
-		return result;
-	}
-
-} // end of PedigreeModel
+}
 
 
 function IndividualModel(m, a1, a2) {
@@ -298,78 +292,77 @@ function IndividualModel(m, a1, a2) {
 	this.allele1 = a1;
 	this.allele2 = a2;
 
+}
+IndividualModel.prototype.isMale = function() {
+	return this.male;
+}
 
-	this.isMale = function() {
-		return male;
-	}
-
-	this.isTraitVisible = function(isDominant) {
-		// the only way for a recessive trait to appear is to have:
-		// both alleles recessive, or one allele recessive and the other empty
-		if (typeof isDominant === "boolean") {
-			if (isDominant)
-				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
-			else
-				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
-		} else {
-			if (isDominant == pedigree.constants.RECESSIVE)
-				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
-			else			// dominant
-				return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
-		}
-	};
-
-	// Gets one of the alleles.  Use this to generate children according to the Punnett Square.
-	// @return DOMINANT, EMPTY, OR RECESSIVE
-	this.getAllele = function(whichN) {
-		if (whichN == pedigree.constants.X_ALLELE)
-			return this.allele1;
+IndividualModel.prototype.isTraitVisible = function(isDominant) {
+	// the only way for a recessive trait to appear is to have:
+	// both alleles recessive, or one allele recessive and the other empty
+	if (typeof isDominant === "boolean") {
+		if (isDominant)
+			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
 		else
-			return this.allele2;
+			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+	} else {
+		if (isDominant == pedigree.constants.RECESSIVE)
+			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+		else			// dominant
+			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
 	}
+};
 
-	// For our purposes, two individuals are equal if they have the same alleles
-	// Optionally, this will also check the individual's gender
-	this.equals = function(individualModel, checkGender) {
-		// if gender not the same, then false
-		if (checkGender) {
-			if (this.isMale() != individualModel.isMale())
-				return false;
-		}
-		if (this.getAllele(1)==individualModel.getAllele(1) && this.getAllele(2)==individualModel.getAllele(2))
-			return true;
-		else if (this.getAllele(1)==individualModel.getAllele(2) && this.getAllele(2)==individualModel.getAllele(1))
-			return true;
-		else
+// Gets one of the alleles.  Use this to generate children according to the Punnett Square.
+// @return DOMINANT, EMPTY, OR RECESSIVE
+IndividualModel.prototype.getAllele = function(whichN) {
+	if (whichN == pedigree.constants.X_ALLELE)
+		return this.allele1;
+	else
+		return this.allele2;
+}
+
+// For our purposes, two individuals are equal if they have the same alleles
+// Optionally, this will also check the individual's gender
+IndividualModel.prototype.equals = function(individualModel, checkGender) {
+	// if gender not the same, then false
+	if (checkGender) {
+		if (this.isMale() != individualModel.isMale())
 			return false;
 	}
+	if (this.getAllele(1)==individualModel.getAllele(1) && this.getAllele(2)==individualModel.getAllele(2))
+		return true;
+	else if (this.getAllele(1)==individualModel.getAllele(2) && this.getAllele(2)==individualModel.getAllele(1))
+		return true;
+	else
+		return false;
+}
 
-	this.toString = function() {
-		result = "";
-		if (male)
-			result += "Male ";
-		else
-			result += "Female ";
-		switch(allele1) {
-			case pedigree.constants.DOMINANT:
-				result += "Dominant ";
-				break;
-			case pedigree.constants.RECESSIVE:
-				result += "Recessive ";
-				break;
-		}
-		switch(allele2) {
-			case pedigree.constants.DOMINANT:
-				result += "Dominant";
-				break;
-			case pedigree.constants.RECESSIVE:
-				result += "Recessive";
-				break;
-			case pedigree.constants.EMPTY:
-				result += "Empty";
-		}
-		return result;
+IndividualModel.prototype.toString = function() {
+	result = "";
+	if (male)
+		result += "Male ";
+	else
+		result += "Female ";
+	switch(allele1) {
+		case pedigree.constants.DOMINANT:
+			result += "Dominant ";
+			break;
+		case pedigree.constants.RECESSIVE:
+			result += "Recessive ";
+			break;
 	}
+	switch(allele2) {
+		case pedigree.constants.DOMINANT:
+			result += "Dominant";
+			break;
+		case pedigree.constants.RECESSIVE:
+			result += "Recessive";
+			break;
+		case pedigree.constants.EMPTY:
+			result += "Empty";
+	}
+	return result;
 }
 
 

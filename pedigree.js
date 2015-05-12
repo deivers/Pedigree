@@ -15,14 +15,29 @@ pedigree.constants = {
 	EMPTY: 0,
 	RECESSIVE: -1,
 	X_ALLELE: 0,
-	Y_ALLELE: 1
+	Y_ALLELE: 1,
+	//
+	BB_BB: 0,
+	BB_Bb: 1,
+	BB_bb: 2,
+	Bb_Bb: 3,
+	Bb_bb: 4,
+	bb_bb: 5,
+	XBXB_XBy: 0,
+	XBXB_Xby: 1,
+	XBXb_XBy: 2,
+	XBXb_Xby: 3,
+	XbXb_XBy: 4,
+	XbXb_Xby: 5
 };
 
 
 $.getScript("utility.js", function(){
+	// run it
 	debug(pedigree.constants.SYMBOL_SIZE);
-	pm = new PedigreeModel(pedigree.constants.DOMINANT_SEXLINKED, 0, 0, 5, 1);
+	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 0, 0, 5, 1);
 	debug(pm.traitType);
+	debug(pm.children);
 
 });
 
@@ -96,17 +111,17 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	// private method
 	function createParentsAutosomal(that, parentType) {
 		switch (parentType) {
-			case 0: // BB BB
+			case pedigree.constants.BB_BB:
 				that.pairing = "BB BB";
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				break;
-			case 1: // BB Bb
+			case pedigree.constants.BB_Bb:
 				that.pairing = "BB Bb";
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				break;
-			case 2: // BB bb
+			case pedigree.constants.BB_bb:
 				if (Math.random() > 0.5) // randomly choose whether father or mother is BB
 				{
 					that.pairing = "BB bb";
@@ -118,12 +133,12 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 					that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				}
 				break;
-			case 3: // Bb Bb
+			case pedigree.constants.Bb_Bb:
 				that.pairing = "Bb Bb";
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				break;
-			case 4: // Bb bb
+			case pedigree.constants.Bb_bb:
 				if (Math.random() > 0.5) // randomly choose whether father or mother is Bb
 				{
 					that.pairing = "Bb bb";
@@ -135,7 +150,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 					that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				}
 				break;
-			case 5: // bb bb
+			case pedigree.constants.bb_bb:
 				that.pairing = "bb bb";
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
@@ -146,32 +161,32 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	// private method
 	function createParentsSexlinked(that, parentType) {
 		switch (parentType) {
-			case 0: // XBXB XBy
+			case pedigree.constants.XBXB_XBy:
 				that.pairing = "XBXB XBy";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
 				break;
-			case 1: // XBXB Xby
+			case pedigree.constants.XBXB_Xby:
 				that.pairing = "XBXB Xby";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
 				break;
-			case 2: // XBXb XBy
+			case pedigree.constants.XBXb_XBy:
 				that.pairing = "XBXb XBy";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
 				break;
-			case 3: // XBXb Xby
+			case pedigree.constants.XBXb_Xby:
 				that.pairing = "XBXb Xby";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
 				break;
-			case 4: // XbXb XBy
+			case pedigree.constants.XbXb_XBy:
 				that.pairing = "XbXb XBy";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
 				break;
-			case 5: // XbXb Xby
+			case pedigree.constants.XbXb_Xby:
 				that.pairing = "XbXb Xby";
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
 				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
@@ -181,7 +196,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 
 	// private method
 	function birth(father, mother) {
-		var toggle = Math.round(Math.random()); // 0 or 1
+		var toggle = Math.floor(Math.random()*2); // 0 or 1
 		var male = (toggle == 1);
 		var a2 = father.getAllele(toggle);
 		var a1 = mother.getAllele(Math.round(Math.random()));
@@ -340,11 +355,11 @@ IndividualModel.prototype.equals = function(individualModel, checkGender) {
 
 IndividualModel.prototype.toString = function() {
 	result = "";
-	if (male)
+	if (this.male)
 		result += "Male ";
 	else
 		result += "Female ";
-	switch(allele1) {
+	switch(this.allele1) {
 		case pedigree.constants.DOMINANT:
 			result += "Dominant ";
 			break;
@@ -352,7 +367,7 @@ IndividualModel.prototype.toString = function() {
 			result += "Recessive ";
 			break;
 	}
-	switch(allele2) {
+	switch(this.allele2) {
 		case pedigree.constants.DOMINANT:
 			result += "Dominant";
 			break;

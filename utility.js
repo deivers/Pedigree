@@ -2,7 +2,10 @@
 
 function debug(x) {
 	if (typeof x === "object") {
-		console.log(JSON.stringify(x));
+		if (exists(x.toString))
+			console.log(x.toString())
+		else
+			console.log(JSON.stringify(x));
 	} else
 		console.log(x);
 }

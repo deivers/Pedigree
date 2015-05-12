@@ -56,13 +56,13 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 
 	this.children = [];
 	// create first generation
-	for (var i = 0; i < numChild; i++) {
+	for (var i=0; i<numChild; i++) {
 		this.children[i] = birth(this.fatherGen1, this.motherGen1);
 	}
 
 	// try to find a pairing that matches parent2 (in which case we will adhere to the desired statistics
 	this.whichChildPairsWithInlaw = -1;
-	for (var i = 0; i < numChild; i++) {
+	for (var i=0; i<numChild; i++) {
 		if (this.children[i].equals(fatherGen2prefered, sexlinked)) {
 			whichChildPairsWithInlaw = i;
 			break;
@@ -89,11 +89,11 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		motherGen2 = this.inlaw;
 		fatherGen2 = this.children[this.whichChildPairsWithInlaw];
 	}
-	for (var i = 0; i < numGrand; i++) {
+	for (var i=0; i<numGrand; i++) {
 		this.grandchildren[i] = birth(fatherGen2, motherGen2);
 	}
 
-	// private function
+	// private method
 	function createParentsAutosomal(that, parentType) {
 		switch (parentType) {
 			case 0: // BB BB
@@ -143,7 +143,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		}
 	}
 
-	// private function
+	// private method
 	function createParentsSexlinked(that, parentType) {
 		switch (parentType) {
 			case 0: // XBXB XBy
@@ -195,7 +195,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		result += "\n";
 		result += "*Mother: " + this.motherGen1.toString();
 		result += "\n";
-		for (var i = 0; i < this.children.length; i++) {
+		for (var i=0; i<this.children.length; i++) {
 			if (i == this.whichChildPairsWithInlaw)
 				result += "*";
 			result += this.children[i].toString();
@@ -203,7 +203,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		}
 		result += "*Inlaw: " + this.inlaw.toString();
 		result += "\n";
-		for (var i = 0; i < this.grandchildren.length; i++) {
+		for (var i=0; i<this.grandchildren.length; i++) {
 			result += this.grandchildren[i].toString();
 			result += "\n";
 		}
@@ -211,11 +211,11 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	}
 
 }
-PedigreeModel.prototype.draw = function(snapCanvas) {
+// public method
+PedigreeModel.prototype.draw = function(canvas) {
 		console.log("draw function");
 		debugger///
 
-		// this code uses Snap.svg //
 		var gridX = 40;
 		var gridY = 60;
 		var headY = 25;
@@ -226,39 +226,39 @@ PedigreeModel.prototype.draw = function(snapCanvas) {
 		var gen1Center = Math.floor(0.4 * width);
 
 		// draw father/mother pairing T
-		snap.line(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY);
-		snap.line(gen1Center, gridY, gen1Center, gridY * 2 - headY);
+		canvas.drawLine(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY);
+		canvas.drawLine(gen1Center, gridY, gen1Center, gridY * 2 - headY);
 		// draw gen 1 sibling line
 		var x = gen1Center - ((gen1 - 1) * gridX) / 2;
-		snap.line(x, gridY * 2 - headY, gen1Center + ((gen1 - 1) * gridX) / 2, gridY * 2 - headY);
-		for (var i = 0; i < gen1; i++) {
+		canvas.drawLine(x, gridY * 2 - headY, gen1Center + ((gen1 - 1) * gridX) / 2, gridY * 2 - headY);
+		for (var i=0; i < gen1; i++) {
 			x = gen1Center - ((gen1 - 1) * gridX) / 2 + i * gridX;
-			snap.line(x, gridY * 2 - headY, x, gridY * 2 - headY + 6);
+			canvas.drawLine(x, gridY * 2 - headY, x, gridY * 2 - headY + 6);
 		}
 		// draw inlaw pairing T
 		var gen2Center = gen1Center + (gen1 * gridX) / 2;
-		snap.line(gen2Center - gridX / 2, gridY * 2, gen2Center + gridX / 2, gridY * 2);
-		snap.line(gen2Center, gridY * 2, gen2Center, gridY * 3 - headY);
+		canvas.drawLine(gen2Center - gridX / 2, gridY * 2, gen2Center + gridX / 2, gridY * 2);
+		canvas.drawLine(gen2Center, gridY * 2, gen2Center, gridY * 3 - headY);
 		// draw gen 2 sibling line
 		var x2 = gen2Center - ((gen2 - 1) * gridX) / 2;
-		snap.line(x2, gridY * 3 - headY, gen2Center + ((gen2 - 1) * gridX) / 2, gridY * 3 - headY);
-		for (var i = 0; i < gen2; i++) {
+		canvas.drawLine(x2, gridY * 3 - headY, gen2Center + ((gen2 - 1) * gridX) / 2, gridY * 3 - headY);
+		for (var i=0; i < gen2; i++) {
 			x2 = gen2Center - ((gen2 - 1) * gridX) / 2 + i * gridX;
-			snap.line(x2, gridY * 3 - headY, x2, gridY * 3 - headY + 6);
+			canvas.drawLine(x2, gridY * 3 - headY, x2, gridY * 3 - headY + 6);
 		}
 
 		// draw symbols
 		var dominant = (this.traitType == pedigree.constants.DOMINANT_SEXLINKED || this.traitType == pedigree.constants.DOMINANT_AUTOSOMAL);
 		var visible = this.fatherGen1.isTraitVisible(dominant);
 		var fatherGS = new GenderSymbol(gen1Center - gridX / 2, gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, true);
-		fatherGS.draw(snap);
+		fatherGS.draw(canvas);
 		visible = this.motherGen1.isTraitVisible(dominant);
 		var motherGS = new GenderSymbol(gen1Center + gridX / 2, gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, false);
-		motherGS.draw(snap);
+		motherGS.draw(canvas);
 
 		visible = this.inlaw.isTraitVisible(dominant);
 		var inlawGS = new GenderSymbol(x + gridX, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, inlaw.isMale());
-		this.inlawGS.draw(snap);
+		this.inlawGS.draw(canvas);
 
 		// sort so that the inlaw's mate is at the right end
 		var temp = this.children;
@@ -266,19 +266,19 @@ PedigreeModel.prototype.draw = function(snapCanvas) {
 		temp[whichChildPairsWithInlaw] = this.children[gen1 - 1];
 
 		var child;
-		for (var i = 0; i < gen1; i++) {
+		for (var i=0; i<gen1; i++) {
 			x = gen1Center - ((gen1 - 1) * gridX) / 2 + i * gridX;
 			visible = temp[i].isTraitVisible(dominant);
 			child = new GenderSymbol(x, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, temp[i].isMale());
-			child.draw(snap);
+			child.draw(canvas);
 		}
 
 		var grand;
-		for (var i = 0; i < gen2; i++) {
+		for (var i=0; i<gen2; i++) {
 			x2 = gen2Center - ((gen2 - 1) * gridX) / 2 + i * gridX;
 			visible = this.grandchildren[i].isTraitVisible(dominant);
 			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, grandchildren[i].isMale());
-			grand.draw(snap);
+			grand.draw(canvas);
 		}
 }
 
@@ -374,24 +374,15 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 		SPREAD_RATIO: 0.75	// controls how big the arrow and crossbar are as a ratio of circle radius
 	};
 
-	this.xCenter = Math.abs(x);
-	this.yCenter = Math.abs(y);
+	this.xCenter = parseFloat(x);
+	this.yCenter = parseFloat(y);
 	this.size = (size > 4) ? size : 5;
-	this.filled = filled;
-	this.lineWidth = (lineW < 1) ? 1 : lineW;
-	this.gender = gender;
-	this.c = Color.getHSBColor(0, 0, 0); // black line and fill color
+	this.filled = filled; // boolean
+	this.lineWidth = (lineW < 1) ? 1 : parseFloat(lineW);
+	this.gender = gender; // true for male
+	this.fillColor = rgba(0, 0, 0, 1);
 
-	var xCenter;
-	var yCenter;
-	var size;		// radius of the circle
-	var filled;
-	var color;
-	var lineWidth;
-	var gender;
-
-
-	function draw(snapSvgContainer) {
+	function draw(canvas) {
 		var halfLineW = Math.floor(lineWidth * 0.0); // was 0.5
 		var xOval = xCenter - size - lineWidth + 1;
 		var yOval = yCenter - size - lineWidth;
@@ -399,32 +390,46 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 		var yFill = yCenter - size - halfLineW - 2;
 		var l1 = Math.round(size * RADIUS_RATIO);
 		var l2 = Math.round(size * SPREAD_RATIO);
-		// anti-alias
-		snapSvgContainer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		snapSvgContainer.setColor(c);
-		snapSvgContainer.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		
+		canvas.setColor(fillColor);
+		// canvas.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		// draw the lines that make up the male and female symbols
 		if (gender) { // true: male
-			snapSvgContainer.drawLine(xCenter, yCenter, xCenter + l1, yCenter - l1);
-			snapSvgContainer.drawLine(xCenter + l1 - l2, yCenter - l1, xCenter + l1, yCenter - l1);
-			snapSvgContainer.drawLine(xCenter + l1, yCenter - l1, xCenter + l1, yCenter - (l1 - l2));
+			canvas.drawLine(xCenter, yCenter, xCenter + l1, yCenter - l1);
+			canvas.drawLine(xCenter + l1 - l2, yCenter - l1, xCenter + l1, yCenter - l1);
+			canvas.drawLine(xCenter + l1, yCenter - l1, xCenter + l1, yCenter - (l1 - l2));
 		} else { // false: female
-			snapSvgContainer.drawLine(xCenter, yCenter, xCenter, yCenter + l1 + l2);
-			snapSvgContainer.drawLine(xCenter - l2, yCenter + l1, xCenter + l2, yCenter + l1);
+			canvas.drawLine(xCenter, yCenter, xCenter, yCenter + l1 + l2);
+			canvas.drawLine(xCenter - l2, yCenter + l1, xCenter + l2, yCenter + l1);
 		}
 		// draw the filling of the circle
 		if (filled)
-			snapSvgContainer.setColor(c);
+			canvas.setColor(fillColor);
 		else
-			snapSvgContainer.setColor(Color.getHSBColor(0, 0, 1)); // white, hides the line inside the oval
-		///snapSvgContainer.setColor(Color.RED);  						// for testing
-		snapSvgContainer.setStroke(new BasicStroke(0));
-		snapSvgContainer.fillOval(xFill, yFill, size * 2 + lineWidth, size * 2 + lineWidth);
+			canvas.setColor(rbga(255, 255, 255, 1)); // white, hides the line inside the oval
+		///canvas.setColor(Color.RED);  						// for testing
+		// canvas.setStroke(new BasicStroke(0));
+		canvas.fillOval(xFill, yFill, size * 2 + lineWidth, size * 2 + lineWidth);
 		// draw the outline of the circle if white fill
 		if (!filled) {
-			snapSvgContainer.setColor(c);  // outline is black even if fill is white
-			snapSvgContainer.setStroke(new BasicStroke(lineWidth));
-			snapSvgContainer.drawOval(xOval, yOval, size * 2 + lineWidth, size * 2 + lineWidth);
+			canvas.setColor(rgba(0, 0, 0, 1));  // outline is black even if fill is white
+			// canvas.setStroke(new BasicStroke(lineWidth));
+			canvas.drawCircle(xOval, yOval, size * 2 + lineWidth, size * 2 + lineWidth);
 		}
 	}
 }
+
+var snapSvgCanvas = {
+	snapPaper: null, // set this before calling any functions below
+	drawLine: function(x1, y1, x2, y2) {
+
+	},
+	drawCircle: function(r, cx, cy) {
+
+	},
+	setColor: function(colorString) {
+
+	}
+	///setStroke: function() {}
+}
+

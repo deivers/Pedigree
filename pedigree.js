@@ -35,9 +35,8 @@ pedigree.constants = {
 $.getScript("utility.js", function(){
 	// run it
 	debug(pedigree.constants.SYMBOL_SIZE);
-	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 0, 0, 5, 1);
-	debug(pm.traitType);
-	debug(pm.children);
+	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 0, 0, 5, 2);
+	debug(pm);
 
 });
 
@@ -93,7 +92,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	else
 		this.inlaw = fatherGen2prefered;
 
-	this.grandchildren = new IndividualModel(numGrand);
+	this.grandchildren = new Array(numGrand);
 	// create second generation
 	var fatherGen2;
 	var motherGen2;

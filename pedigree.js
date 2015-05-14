@@ -2,6 +2,7 @@
 var pedigree = {};
 var pm;
 
+
 pedigree.constants = {
 	DOMINANT_AUTOSOMAL: 0,
 	RECESSIVE_AUTOSOMAL: 1,
@@ -389,6 +390,7 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 	this.xCenter = parseFloat(x);
 	this.yCenter = parseFloat(y);
 	this.size = (size > 4) ? size : 5;
+	// this.radius = 20;
 	this.filled = filled; // boolean
 	this.lineWidth = (lineW < 1) ? 1 : parseFloat(lineW);
 	this.gender = gender; // true for male
@@ -422,35 +424,34 @@ GenderSymbol.prototype.draw = function(canvas) {
 		canvas.setColor('rgba(255, 255, 255, 1)'); // white, hides the line inside the oval
 	///canvas.setColor(Color.RED);  						// for testing
 	// canvas.setStroke(new BasicStroke(0));
-	canvas.drawCircle(this.size, xFill, yFill);
+	canvas.drawCircle(xFill, yFill, this.size);
 	// draw the outline of the circle if white fill
 	if (!this.filled) {
 		canvas.setColor('rgba(0, 0, 0, 1)');  // outline is black even if fill is white
 		// canvas.setStroke(new BasicStroke(lineWidth));
-		canvas.drawCircle(this.size, xOval, yOval);
+		canvas.drawCircle(xOval, yOval, this.size);
 	}
 }
 
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
+	attrs: {fill: 'black', stroke: 'black', 'stroke-width': '2px'},
+	// fillAttr: null,
+	// strokeAttrs: null,
 	drawLine: function(x1, y1, x2, y2) {
-		return this.snapPaper.line(x1, y1, x2, y2);
+		return this.snapPaper.line(x1, y1, x2, y2).attr(this.attrs);
 	},
 	drawCircle: function(r, cx, cy) {
 		return this.snapPaper.circle(r, cx, cy);
 	},
 	setColor: function(colorString) {
-		this.snapPaper.attr({
-  			fill: colorString
-		});
+		this.attrs.fill = colorString;
 		return this;
 	},
 	setStroke: function(strokeColorString) {
-		this.snapPaper.attr({
-  			stroke: strokeColorString,
-  			'stroke-width': 2
-		});
+		this.attrs.stroke = strokeColorString;
+  		this.attrs['stroke-width'] = '2px';
 		return this;
 	},
 	getSize: function() {

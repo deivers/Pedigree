@@ -38,6 +38,9 @@ $.getScript("utility.js", function(){
 	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 0, 0, 5, 2);
 	debug(pm);
 
+	// create snap drawing context (paper)
+	snapSvgCanvas.snapPaper = Snap("#canvas");
+	pm.draw(snapSvgCanvas);
 });
 
 
@@ -45,7 +48,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	this.traitType = traittype;
 	this.fatherGen1 = null;
 	this.motherGen1 = null;
-	// this.inlaw
+	this.inlaw = null;
 	// this.whichChildPairsWithInlaw
 	// this.grandchildren
 	this.pairing = null;
@@ -121,8 +124,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				break;
 			case pedigree.constants.BB_bb:
-				if (Math.random() > 0.5) // randomly choose whether father or mother is BB
-				{
+				if (Math.random() > 0.5) { // randomly choose whether father or mother is BB
 					that.pairing = "BB bb";
 					that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
 					that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
@@ -138,8 +140,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 				break;
 			case pedigree.constants.Bb_bb:
-				if (Math.random() > 0.5) // randomly choose whether father or mother is Bb
-				{
+				if (Math.random() > 0.5) { // randomly choose whether father or mother is Bb
 					that.pairing = "Bb bb";
 					that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
 					that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
@@ -228,7 +229,6 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 // public method
 PedigreeModel.prototype.draw = function(canvas) {
 		console.log("draw function");
-		debugger///
 
 		var gridX = 40;
 		var gridY = 60;
@@ -237,7 +237,7 @@ PedigreeModel.prototype.draw = function(canvas) {
 		var gen1 = this.children.length;
 		var gen2 = this.grandchildren.length;
 
-		var gen1Center = Math.floor(0.4 * width);
+		var gen1Center = Math.floor(0.4 * canvas.getSize().width);
 
 		// draw father/mother pairing T
 		canvas.drawLine(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY);
@@ -271,13 +271,13 @@ PedigreeModel.prototype.draw = function(canvas) {
 		motherGS.draw(canvas);
 
 		visible = this.inlaw.isTraitVisible(dominant);
-		var inlawGS = new GenderSymbol(x + gridX, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, inlaw.isMale());
-		this.inlawGS.draw(canvas);
+		var inlawGS = new GenderSymbol(x + gridX, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, this.inlaw.isMale());
+		inlawGS.draw(canvas);
 
 		// sort so that the inlaw's mate is at the right end
 		var temp = this.children;
-		temp[gen1 - 1] = this.children[whichChildPairsWithInlaw];
-		temp[whichChildPairsWithInlaw] = this.children[gen1 - 1];
+		temp[gen1 - 1] = this.children[this.whichChildPairsWithInlaw];
+		temp[this.whichChildPairsWithInlaw] = this.children[gen1 - 1];
 
 		var child;
 		for (var i=0; i<gen1; i++) {
@@ -291,7 +291,7 @@ PedigreeModel.prototype.draw = function(canvas) {
 		for (var i=0; i<gen2; i++) {
 			x2 = gen2Center - ((gen2 - 1) * gridX) / 2 + i * gridX;
 			visible = this.grandchildren[i].isTraitVisible(dominant);
-			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, grandchildren[i].isMale());
+			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, this.grandchildren[i].isMale());
 			grand.draw(canvas);
 		}
 }
@@ -316,14 +316,14 @@ IndividualModel.prototype.isTraitVisible = function(isDominant) {
 	// both alleles recessive, or one allele recessive and the other empty
 	if (typeof isDominant === "boolean") {
 		if (isDominant)
-			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
+			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) >= 0);
 		else
-			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) < 0);
 	} else {
 		if (isDominant == pedigree.constants.RECESSIVE)
-			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) < 0);
+			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) < 0);
 		else			// dominant
-			return (getAllele(pedigree.constants.X_ALLELE)+getAllele(pedigree.constants.Y_ALLELE) >= 0);
+			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) >= 0);
 	}
 };
 
@@ -346,10 +346,8 @@ IndividualModel.prototype.equals = function(individualModel, checkGender) {
 	}
 	if (this.getAllele(1)==individualModel.getAllele(1) && this.getAllele(2)==individualModel.getAllele(2))
 		return true;
-	else if (this.getAllele(1)==individualModel.getAllele(2) && this.getAllele(2)==individualModel.getAllele(1))
-		return true;
 	else
-		return false;
+		return (this.getAllele(1)==individualModel.getAllele(2) && this.getAllele(2)==individualModel.getAllele(1))
 }
 
 IndividualModel.prototype.toString = function() {
@@ -394,56 +392,72 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 	this.filled = filled; // boolean
 	this.lineWidth = (lineW < 1) ? 1 : parseFloat(lineW);
 	this.gender = gender; // true for male
-	this.fillColor = rgba(0, 0, 0, 1);
+	this.fillColor = 'rgba(0, 0, 0, 1)';
+}
 
-	function draw(canvas) {
-		var halfLineW = Math.floor(lineWidth * 0.0); // was 0.5
-		var xOval = xCenter - size - lineWidth + 1;
-		var yOval = yCenter - size - lineWidth;
-		var xFill = xCenter - size - halfLineW - 1;
-		var yFill = yCenter - size - halfLineW - 2;
-		var l1 = Math.round(size * RADIUS_RATIO);
-		var l2 = Math.round(size * SPREAD_RATIO);
-		
-		canvas.setColor(fillColor);
-		// canvas.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		// draw the lines that make up the male and female symbols
-		if (gender) { // true: male
-			canvas.drawLine(xCenter, yCenter, xCenter + l1, yCenter - l1);
-			canvas.drawLine(xCenter + l1 - l2, yCenter - l1, xCenter + l1, yCenter - l1);
-			canvas.drawLine(xCenter + l1, yCenter - l1, xCenter + l1, yCenter - (l1 - l2));
-		} else { // false: female
-			canvas.drawLine(xCenter, yCenter, xCenter, yCenter + l1 + l2);
-			canvas.drawLine(xCenter - l2, yCenter + l1, xCenter + l2, yCenter + l1);
-		}
-		// draw the filling of the circle
-		if (filled)
-			canvas.setColor(fillColor);
-		else
-			canvas.setColor(rbga(255, 255, 255, 1)); // white, hides the line inside the oval
-		///canvas.setColor(Color.RED);  						// for testing
-		// canvas.setStroke(new BasicStroke(0));
-		canvas.fillOval(xFill, yFill, size * 2 + lineWidth, size * 2 + lineWidth);
-		// draw the outline of the circle if white fill
-		if (!filled) {
-			canvas.setColor(rgba(0, 0, 0, 1));  // outline is black even if fill is white
-			// canvas.setStroke(new BasicStroke(lineWidth));
-			canvas.drawCircle(xOval, yOval, size * 2 + lineWidth, size * 2 + lineWidth);
-		}
+GenderSymbol.prototype.draw = function(canvas) {
+	var halfLineW = Math.floor(this.lineWidth * 0.0); // was 0.5
+	var xOval = this.xCenter - this.size - this.lineWidth + 1;
+	var yOval = this.yCenter - this.size - this.lineWidth;
+	var xFill = this.xCenter - this.size - halfLineW - 1;
+	var yFill = this.yCenter - this.size - halfLineW - 2;
+	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
+	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
+	
+	canvas.setColor(this.fillColor);
+	// canvas.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+	// draw the lines that make up the male and female symbols
+	if (this.gender) { // true: male
+		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter + l1, this.yCenter - l1);
+		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1, this.xCenter + l1, this.yCenter - l1);
+		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1, this.yCenter - (l1 - l2));
+	} else { // false: female
+		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter, this.yCenter + l1 + l2);
+		canvas.drawLine(this.xCenter - l2, this.yCenter + l1, this.xCenter + l2, this.yCenter + l1);
+	}
+	// draw the filling of the circle
+	if (this.filled)
+		canvas.setColor(this.fillColor);
+	else
+		canvas.setColor('rgba(255, 255, 255, 1)'); // white, hides the line inside the oval
+	///canvas.setColor(Color.RED);  						// for testing
+	// canvas.setStroke(new BasicStroke(0));
+	canvas.drawCircle(this.size, xFill, yFill);
+	// draw the outline of the circle if white fill
+	if (!this.filled) {
+		canvas.setColor('rgba(0, 0, 0, 1)');  // outline is black even if fill is white
+		// canvas.setStroke(new BasicStroke(lineWidth));
+		canvas.drawCircle(this.size, xOval, yOval);
 	}
 }
+
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
 	drawLine: function(x1, y1, x2, y2) {
-
+		return this.snapPaper.line(x1, y1, x2, y2);
 	},
 	drawCircle: function(r, cx, cy) {
-
+		return this.snapPaper.circle(r, cx, cy);
 	},
 	setColor: function(colorString) {
-
+		this.snapPaper.attr({
+  			fill: colorString
+		});
+		return this;
+	},
+	setStroke: function(strokeColorString) {
+		this.snapPaper.attr({
+  			stroke: strokeColorString,
+  			'stroke-width': 2
+		});
+		return this;
+	},
+	getSize: function() {
+		return {
+			width: $("#canvas").width(),
+			height: $("#canvas").height()
+		};
 	}
-	///setStroke: function() {}
 }
 

@@ -9,7 +9,8 @@ pedigree.constants = {
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
 	// graphic parameters
-	SYMBOL_SIZE: 8,
+	SYMBOL_SIZE: 12,
+	SEPARATION: 60,
 	LINE_THICKNESS: 2,
 	// IndividualModel
 	DOMINANT: 1,
@@ -36,7 +37,7 @@ pedigree.constants = {
 $.getScript("utility.js", function(){
 	// run it
 	debug(pedigree.constants.SYMBOL_SIZE);
-	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 0, 0, 5, 2);
+	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 2, 2, 5, 2);
 	debug(pm);
 
 	// create snap drawing context (paper)
@@ -231,9 +232,9 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 PedigreeModel.prototype.draw = function(canvas) {
 		console.log("draw function");
 
-		var gridX = 40;
-		var gridY = 60;
-		var headY = 25;
+		var gridX = pedigree.constants.SEPARATION;
+		var gridY = pedigree.constants.SEPARATION*1.5;
+		var headY = pedigree.constants.SEPARATION/2;
 
 		var gen1 = this.children.length;
 		var gen2 = this.grandchildren.length;
@@ -383,8 +384,9 @@ IndividualModel.prototype.toString = function() {
 function GenderSymbol(x, y, size, filled, lineW, gender) {
 
 	this.c = {
-		RADIUS_RATIO: 1.8,	// controls how long the radial line is as a ratio of circle radius
-		SPREAD_RATIO: 0.75	// controls how big the arrow and crossbar are as a ratio of circle radius
+		RADIUS_RATIO: 1.7,	// controls how long the radial line is as a ratio of circle radius
+		SPREAD_RATIO: 0.7,	// controls how big the arrow and crossbar are as a ratio of circle radius
+		SLANT: 1 // pixels of offset that sharpens the male arrows
 	};
 
 	this.xCenter = parseFloat(x);
@@ -398,11 +400,11 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 }
 
 GenderSymbol.prototype.draw = function(canvas) {
-	var halfLineW = Math.floor(this.lineWidth * 0.0); // was 0.5
-	var xOval = this.xCenter - this.size - this.lineWidth + 1;
-	var yOval = this.yCenter - this.size - this.lineWidth;
-	var xFill = this.xCenter - this.size - halfLineW - 1;
-	var yFill = this.yCenter - this.size - halfLineW - 2;
+	var halfLineW = Math.floor(this.lineWidth * 0.0);
+	var xOval = this.xCenter - halfLineW;
+	var yOval = this.yCenter - halfLineW;
+	var xFill = this.xCenter - halfLineW;
+	var yFill = this.yCenter - halfLineW;
 	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
 	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
 	
@@ -410,9 +412,12 @@ GenderSymbol.prototype.draw = function(canvas) {
 	// canvas.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 	// draw the lines that make up the male and female symbols
 	if (this.gender) { // true: male
-		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter + l1, this.yCenter - l1);
-		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1, this.xCenter + l1, this.yCenter - l1);
-		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1, this.yCenter - (l1 - l2));
+		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter + l1, this.yCenter - l1)
+			.attr(canvas.attrs);
+		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1 + this.c.SLANT, this.xCenter + l1, this.yCenter - l1)
+			.attr(canvas.attrs);
+		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1 - this.c.SLANT, this.yCenter - (l1 - l2))
+			.attr(canvas.attrs);
 	} else { // false: female
 		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter, this.yCenter + l1 + l2);
 		canvas.drawLine(this.xCenter - l2, this.yCenter + l1, this.xCenter + l2, this.yCenter + l1);
@@ -424,19 +429,19 @@ GenderSymbol.prototype.draw = function(canvas) {
 		canvas.setColor('rgba(255, 255, 255, 1)'); // white, hides the line inside the oval
 	///canvas.setColor(Color.RED);  						// for testing
 	// canvas.setStroke(new BasicStroke(0));
-	canvas.drawCircle(xFill, yFill, this.size);
+	// canvas.drawCircle(xFill, yFill, this.size);
 	// draw the outline of the circle if white fill
-	if (!this.filled) {
+	// if (!this.filled) {
 		canvas.setColor('rgba(0, 0, 0, 1)');  // outline is black even if fill is white
 		// canvas.setStroke(new BasicStroke(lineWidth));
 		canvas.drawCircle(xOval, yOval, this.size);
-	}
+	// }
 }
 
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
-	attrs: {fill: 'black', stroke: 'black', 'stroke-width': '2px'},
+	attrs: {fill: '#222', stroke: '#222', 'stroke-width': '3px', 'stroke-linecap': 'round'},
 	// fillAttr: null,
 	// strokeAttrs: null,
 	drawLine: function(x1, y1, x2, y2) {
@@ -447,11 +452,6 @@ var snapSvgCanvas = {
 	},
 	setColor: function(colorString) {
 		this.attrs.fill = colorString;
-		return this;
-	},
-	setStroke: function(strokeColorString) {
-		this.attrs.stroke = strokeColorString;
-  		this.attrs['stroke-width'] = '2px';
 		return this;
 	},
 	getSize: function() {

@@ -11,7 +11,7 @@ pedigree.constants = {
 	// graphic parameters
 	SYMBOL_SIZE: 16,
 	SEPARATION: 72,
-	LINE_THICKNESS: 2,
+	LINE_THICKNESS: 4,
 	// IndividualModel
 	DOMINANT: 1,
 	EMPTY: 0,
@@ -413,7 +413,7 @@ GenderSymbol.prototype.draw = function(canvas) {
 	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
 	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
 
-	canvas.defaultStroke(pedigree.constants.DARK_COLOR, 2);
+	canvas.defaultStroke(pedigree.constants.DARK_COLOR, pedigree.constants.LINE_THICKNESS);
 	
 	// draw the lines that make up the male and female symbols
 	if (this.gender) { // true: male

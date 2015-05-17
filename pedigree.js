@@ -237,7 +237,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 }
 // public method
 PedigreeModel.prototype.draw = function(canvas) {
-		debug("draw function");
+		// debug("draw function");
 
 		var gridX = pedigree.constants.SEPARATION;
 		var gridY = pedigree.constants.SEPARATION*1.5;
@@ -249,25 +249,25 @@ PedigreeModel.prototype.draw = function(canvas) {
 		var gen1Center = Math.floor(0.4 * canvas.getSize().width);
 
 		// draw father/mother pairing T
-		canvas.drawLine(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY);
-		canvas.drawLine(gen1Center, gridY, gen1Center, gridY * 2 - headY);
+		canvas.drawLine(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY, 1);
+		canvas.drawLine(gen1Center, gridY, gen1Center, gridY * 2 - headY, 1);
 		// draw gen 1 sibling line
 		var x = gen1Center - ((gen1 - 1) * gridX) / 2;
-		canvas.drawLine(x, gridY * 2 - headY, gen1Center + ((gen1 - 1) * gridX) / 2, gridY * 2 - headY);
+		canvas.drawLine(x, gridY * 2 - headY, gen1Center + ((gen1 - 1) * gridX) / 2, gridY * 2 - headY, 1);
 		for (var i=0; i < gen1; i++) {
 			x = gen1Center - ((gen1 - 1) * gridX) / 2 + i * gridX;
-			canvas.drawLine(x, gridY * 2 - headY, x, gridY * 2 - headY + 6);
+			canvas.drawLine(x, gridY * 2 - headY, x, gridY * 2 - headY + 6, 1);
 		}
 		// draw inlaw pairing T
 		var gen2Center = gen1Center + (gen1 * gridX) / 2;
-		canvas.drawLine(gen2Center - gridX / 2, gridY * 2, gen2Center + gridX / 2, gridY * 2);
-		canvas.drawLine(gen2Center, gridY * 2, gen2Center, gridY * 3 - headY);
+		canvas.drawLine(gen2Center - gridX / 2, gridY * 2, gen2Center + gridX / 2, gridY * 2, 1);
+		canvas.drawLine(gen2Center, gridY * 2, gen2Center, gridY * 3 - headY, 1);
 		// draw gen 2 sibling line
 		var x2 = gen2Center - ((gen2 - 1) * gridX) / 2;
-		canvas.drawLine(x2, gridY * 3 - headY, gen2Center + ((gen2 - 1) * gridX) / 2, gridY * 3 - headY);
+		canvas.drawLine(x2, gridY * 3 - headY, gen2Center + ((gen2 - 1) * gridX) / 2, gridY * 3 - headY, 1);
 		for (var i=0; i < gen2; i++) {
 			x2 = gen2Center - ((gen2 - 1) * gridX) / 2 + i * gridX;
-			canvas.drawLine(x2, gridY * 3 - headY, x2, gridY * 3 - headY + 6);
+			canvas.drawLine(x2, gridY * 3 - headY, x2, gridY * 3 - headY + 6, 1);
 		}
 
 		// draw symbols
@@ -413,7 +413,7 @@ GenderSymbol.prototype.draw = function(canvas) {
 	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
 	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
 
-	canvas.defaultStrokeColor(pedigree.constants.DARK_COLOR);
+	canvas.defaultStroke(pedigree.constants.DARK_COLOR, 2);
 	
 	// draw the lines that make up the male and female symbols
 	if (this.gender) { // true: male
@@ -430,9 +430,11 @@ GenderSymbol.prototype.draw = function(canvas) {
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
-	strokeWidth: 2,
-	drawLine: function(x1, y1, x2, y2) {
-		return this.snapPaper.line(x1, y1, x2, y2);
+	drawLine: function(x1, y1, x2, y2, strokeWidth) {
+		if (typeof strokeWidth === 'number')
+			return this.snapPaper.line(x1, y1, x2, y2).attr({'stroke-width': strokeWidth});
+		else
+			return this.snapPaper.line(x1, y1, x2, y2); // the stroke width will be whatever was set on the group - see defaultStrokeColor below
 	},
 	drawCircle: function(r, cx, cy, fillColor) {
 		return this.snapPaper.circle(r, cx, cy).attr({fill: fillColor});
@@ -440,10 +442,10 @@ var snapSvgCanvas = {
 	defaultFillColor: function(colorString) {
 		this.snapPaper.attr({fill: colorString});
 	},
-	defaultStrokeColor: function(colorString) {
+	defaultStroke: function(colorString, strokeWidth) {
 		this.snapPaper.attr({stroke: colorString});
 		// also set the default stroke width
-		this.snapPaper.attr({'stroke-width': this.strokeWidth});
+		this.snapPaper.attr({'stroke-width': strokeWidth});
 		this.snapPaper.attr({'stroke-linecap': 'round'});
 	},
 	getSize: function() {

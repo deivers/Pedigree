@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<title>Pedigree</title>
+
+		<!-- Bootstrap -->
+		<link href="bs/css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+	<style>
+		.dropdown-toggle {
+    	left: 50%;
+    }
+	</style>
+	</head>
+	<body>
+		<h1>Pedigree</h1>
+
+		<div class="well">
+			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=880 height=550>
+			</svg>
+		</div>
+		<div class="col-sm-6">
+			<p>
+				<a class="btn btn-lg center-block" href="#" role="button">View another pedigree</a>
+			</p>
+		</div>
+		<div class="col-sm-6 dropdown">
+      <div class="btn-group"> <a class="btn btn-lg dropdown-toggle btn-select center-block" data-toggle="dropdown" href="#">Select a Country <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">Dominant Autosomal</a></li>
+          <li><a href="#">Recessive Autosomal</a></li>
+          <li><a href="#">Dominant Sex-linked</a></li>
+          <li><a href="#">Recessive Sex-linked</a></li>
+        </ul>
+      </div>
+		</div>
+				
+
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script src="bs/js/bootstrap.min.js"></script>
+		<script>
+			$(".dropdown-menu li a").click(function(){
+			  var selText = $(this).text();
+			  $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+			});
+		</script>
+
+	</body>
+</html>

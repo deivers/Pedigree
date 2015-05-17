@@ -19,6 +19,9 @@ pedigree.constants = {
 	X_ALLELE: 0,
 	Y_ALLELE: 1,
 	//
+	DARK_COLOR: '#222',
+	LIGHT_COLOR: '#eee',
+	//
 	BB_BB: 0,
 	BB_Bb: 1,
 	BB_bb: 2,
@@ -35,13 +38,18 @@ pedigree.constants = {
 
 
 $.getScript("utility.js", function(){
+	possibleChoices = ["", "Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"];
+	debug("\n\n\n");
 	// run it
 	debug(pedigree.constants.SYMBOL_SIZE);
-	pm = new PedigreeModel(pedigree.constants.RECESSIVE_AUTOSOMAL, 2, 2, 5, 2);
+	var currentTrait = pedigree.constants.DOMINANT_SEXLINKED;
+	pm = new PedigreeModel(currentTrait, 3, 3, 5, 2);
 	debug(pm);
+	debug("Trait: " + possibleChoices[currentTrait + 1] + "   First generation: "
+					+ pm.pairing);
 
-	// create snap drawing context (paper)
-	snapSvgCanvas.snapPaper = Snap("#canvas");
+	// create snap drawing context (a.k.a paper)
+	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	pm.draw(snapSvgCanvas);
 });
 
@@ -226,11 +234,10 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 		}
 		return result;
 	}
-
 }
 // public method
 PedigreeModel.prototype.draw = function(canvas) {
-		console.log("draw function");
+		debug("draw function");
 
 		var gridX = pedigree.constants.SEPARATION;
 		var gridY = pedigree.constants.SEPARATION*1.5;
@@ -391,12 +398,10 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 
 	this.xCenter = parseFloat(x);
 	this.yCenter = parseFloat(y);
-	this.size = (size > 4) ? size : 5;
-	// this.radius = 20;
-	this.filled = filled; // boolean
+	this.size = (size > 4) ? size : 5; // radius of circles
 	this.lineWidth = (lineW < 1) ? 1 : parseFloat(lineW);
 	this.gender = gender; // true for male
-	this.fillColor = 'rgba(0, 0, 0, 1)';
+	this.fillColor = (filled) ? pedigree.constants.DARK_COLOR : pedigree.constants.LIGHT_COLOR;
 }
 
 GenderSymbol.prototype.draw = function(canvas) {
@@ -407,52 +412,38 @@ GenderSymbol.prototype.draw = function(canvas) {
 	var yFill = this.yCenter - halfLineW;
 	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
 	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
+
+	canvas.defaultStrokeColor(pedigree.constants.DARK_COLOR);
 	
-	canvas.setColor(this.fillColor);
-	// canvas.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 	// draw the lines that make up the male and female symbols
 	if (this.gender) { // true: male
-		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter + l1, this.yCenter - l1)
-			.attr(canvas.attrs);
-		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1 + this.c.SLANT, this.xCenter + l1, this.yCenter - l1)
-			.attr(canvas.attrs);
-		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1 - this.c.SLANT, this.yCenter - (l1 - l2))
-			.attr(canvas.attrs);
+		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter + l1, this.yCenter - l1);
+		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1 + this.c.SLANT, this.xCenter + l1, this.yCenter - l1);
+		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1 - this.c.SLANT, this.yCenter - (l1 - l2));
 	} else { // false: female
 		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter, this.yCenter + l1 + l2);
 		canvas.drawLine(this.xCenter - l2, this.yCenter + l1, this.xCenter + l2, this.yCenter + l1);
 	}
-	// draw the filling of the circle
-	if (this.filled)
-		canvas.setColor(this.fillColor);
-	else
-		canvas.setColor('rgba(255, 255, 255, 1)'); // white, hides the line inside the oval
-	///canvas.setColor(Color.RED);  						// for testing
-	// canvas.setStroke(new BasicStroke(0));
-	// canvas.drawCircle(xFill, yFill, this.size);
-	// draw the outline of the circle if white fill
-	// if (!this.filled) {
-		canvas.setColor('rgba(0, 0, 0, 1)');  // outline is black even if fill is white
-		// canvas.setStroke(new BasicStroke(lineWidth));
-		canvas.drawCircle(xOval, yOval, this.size);
-	// }
+	canvas.drawCircle(xOval, yOval, this.size, this.fillColor);
 }
 
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
-	attrs: {fill: '#222', stroke: '#222', 'stroke-width': '3px', 'stroke-linecap': 'round'},
-	// fillAttr: null,
-	// strokeAttrs: null,
+	strokeWidth: 2,
 	drawLine: function(x1, y1, x2, y2) {
-		return this.snapPaper.line(x1, y1, x2, y2).attr(this.attrs);
+		return this.snapPaper.line(x1, y1, x2, y2);
 	},
-	drawCircle: function(r, cx, cy) {
-		return this.snapPaper.circle(r, cx, cy);
+	drawCircle: function(r, cx, cy, fillColor) {
+		return this.snapPaper.circle(r, cx, cy).attr({fill: fillColor});
 	},
-	setColor: function(colorString) {
-		this.attrs.fill = colorString;
-		return this;
+	defaultFillColor: function(colorString) {
+		this.snapPaper.attr({fill: colorString});
+	},
+	defaultStrokeColor: function(colorString) {
+		this.snapPaper.attr({stroke: colorString});
+		// also set the default stroke width
+		this.snapPaper.attr({'stroke-width': this.strokeWidth});
 	},
 	getSize: function() {
 		return {

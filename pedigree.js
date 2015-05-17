@@ -9,8 +9,8 @@ pedigree.constants = {
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
 	// graphic parameters
-	SYMBOL_SIZE: 12,
-	SEPARATION: 60,
+	SYMBOL_SIZE: 16,
+	SEPARATION: 72,
 	LINE_THICKNESS: 2,
 	// IndividualModel
 	DOMINANT: 1,
@@ -391,8 +391,8 @@ IndividualModel.prototype.toString = function() {
 function GenderSymbol(x, y, size, filled, lineW, gender) {
 
 	this.c = {
-		RADIUS_RATIO: 1.7,	// controls how long the radial line is as a ratio of circle radius
-		SPREAD_RATIO: 0.7,	// controls how big the arrow and crossbar are as a ratio of circle radius
+		RADIUS_RATIO: 1.6,	// controls how long the radial line is as a ratio of circle radius
+		SPREAD_RATIO: 0.65,	// controls how big the arrow and crossbar are as a ratio of circle radius
 		SLANT: 1 // pixels of offset that sharpens the male arrows
 	};
 
@@ -421,8 +421,8 @@ GenderSymbol.prototype.draw = function(canvas) {
 		canvas.drawLine(this.xCenter + l1 - l2, this.yCenter - l1 + this.c.SLANT, this.xCenter + l1, this.yCenter - l1);
 		canvas.drawLine(this.xCenter + l1, this.yCenter - l1, this.xCenter + l1 - this.c.SLANT, this.yCenter - (l1 - l2));
 	} else { // false: female
-		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter, this.yCenter + l1 + l2);
-		canvas.drawLine(this.xCenter - l2, this.yCenter + l1, this.xCenter + l2, this.yCenter + l1);
+		canvas.drawLine(this.xCenter, this.yCenter, this.xCenter, this.yCenter + l1 + l2 - 1);
+		canvas.drawLine(this.xCenter - l2 + 1, this.yCenter + l1, this.xCenter + l2 - 1, this.yCenter + l1);
 	}
 	canvas.drawCircle(xOval, yOval, this.size, this.fillColor);
 }
@@ -444,6 +444,7 @@ var snapSvgCanvas = {
 		this.snapPaper.attr({stroke: colorString});
 		// also set the default stroke width
 		this.snapPaper.attr({'stroke-width': this.strokeWidth});
+		this.snapPaper.attr({'stroke-linecap': 'round'});
 	},
 	getSize: function() {
 		return {

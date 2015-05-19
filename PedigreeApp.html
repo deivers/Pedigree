@@ -19,15 +19,18 @@
 
 	<style>
 		.dropdown-toggle {
-    	left: 50%;
-    }
+			left: 30%;
+		}
+		body {
+			margin-left: 30px
+		}
 	</style>
 	</head>
 	<body>
 		<h1>Pedigree</h1>
 
 		<div class="well">
-			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=880 height=550>
+			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=500 height=500 class="center-block">
 			</svg>
 		</div>
 		<div class="col-sm-6">
@@ -35,26 +38,28 @@
 				<a class="btn btn-lg center-block" href="#" role="button">View another pedigree</a>
 			</p>
 		</div>
-		<div class="col-sm-6 dropdown">
-      <div class="btn-group"> <a class="btn btn-lg dropdown-toggle btn-select center-block" data-toggle="dropdown" href="#">Select a Country <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Dominant Autosomal</a></li>
-          <li><a href="#">Recessive Autosomal</a></li>
-          <li><a href="#">Dominant Sex-linked</a></li>
-          <li><a href="#">Recessive Sex-linked</a></li>
-        </ul>
-      </div>
+		<div class="col-sm-6 dropdown"> 
+			<div class="btn-group center-block"> <a class="btn btn-lg dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select a trait type <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="#">Dominant Autosomal</a></li>
+					<li><a href="#">Recessive Autosomal</a></li>
+					<li><a href="#">Dominant Sex-linked</a></li>
+					<li><a href="#">Recessive Sex-linked</a></li>
+				</ul>
+			</div>
 		</div>
 				
 
 		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="pedigree.js"></script>
+		<script src="./lib/snap.svg-min.js"></script>
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="bs/js/bootstrap.min.js"></script>
 		<script>
 			$(".dropdown-menu li a").click(function(){
-			  var selText = $(this).text();
-			  $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+				var selText = $(this).text();
+				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
 			});
 		</script>
 

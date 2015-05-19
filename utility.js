@@ -22,10 +22,13 @@ jQuery.fn.exists = function(){
 }
 
 Array.prototype.max = function() {
-	var maxVal = this[0];
-	this.forEach(function(val){
-		maxVal = Math.max(val, maxVal);
-	});
-	return maxVal;
-}
+ return Math.max.apply(null, this);
+};
+// Array.prototype.max = function() {
+// 	var maxVal = this[0];
+// 	this.forEach(function(val){
+// 		maxVal = Math.max(val, maxVal);
+// 	});
+// 	return maxVal;
+// }
 

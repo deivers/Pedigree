@@ -1,13 +1,15 @@
 
 var pedigree = {};
 var pm;
+var pedigreeCount = 0, traitCount = 0, teachModeCounter = 0;
+var currentTrait;
 
-
-pedigree.constants = {
+pedigree.constant = {
 	DOMINANT_AUTOSOMAL: 0,
 	RECESSIVE_AUTOSOMAL: 1,
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
+	traitChoices: ["Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"],
 	// graphic parameters
 	SYMBOL_SIZE: 16,
 	SEPARATION: 72,
@@ -33,19 +35,29 @@ pedigree.constants = {
 	XBXb_XBy: 2,
 	XBXb_Xby: 3,
 	XbXb_XBy: 4,
-	XbXb_Xby: 5
+	XbXb_Xby: 5,
+
+	// a list of 4 ratios for trait frequencies:  Dominant Autosomal, Recessive Autosomal, Dominant Sex-linked, Recessive Sex-linked
+	traitTypeFrequency: [0.25, 0.25, 0.25, 0.25],
+	// a list of 6 ratios for Autosomal frequencies:  BBxBB, BBxBb, BBxbb, BbxBb, Bbxbb, bbxbb
+	autosomalFrequency: [0.05, 0.1, 0.2, 0.3, 0.3, 0.05],
+	// a list of 6 ratios for Sex-linked frequencies:  XBXB.XBy, XBXB.Xby, XBXb.XBy, XBXb.Xby, XbXb.XBy, XbXb.Xby
+	sexlinkedFrequency: [0.05, 0.15, 0.3, 0.3, 0.15, 0.05],
+	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
+	numOffspringLimits: [1, 6, 1, 6],
+
+	teachMode: false	// false means quiz mode
 };
 
 
 $.getScript("utility.js", function(){
-	possibleChoices = ["", "Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"];
 	debug("\n\n\n");
 	// run it
-	debug(pedigree.constants.SYMBOL_SIZE);
-	var currentTrait = pedigree.constants.DOMINANT_SEXLINKED;
+	debug(pedigree.constant.SYMBOL_SIZE);
+	currentTrait = pedigree.constant.DOMINANT_SEXLINKED;
 	pm = new PedigreeModel(currentTrait, 3, 3, 5, 2);
 	debug(pm);
-	debug("Trait: " + possibleChoices[currentTrait + 1] + "   First generation: "
+	debug("Trait: " + pedigree.constant.traitChoices[currentTrait + 1] + "   First generation: "
 					+ pm.pairing);
 
 	// create snap drawing context (a.k.a paper)
@@ -53,6 +65,21 @@ $.getScript("utility.js", function(){
 	pm.draw(snapSvgCanvas);
 });
 
+function viewAnother() {
+	alert("viewAnother function");
+}
+
+function traitSelected(selectedText) {
+	if (exists(selectedText)) {
+		var traitIndex = pedigree.constant.traitChoices.indexOf();
+		pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);
+		pm.draw(snapSvgCanvas);
+	}
+}
+
+function nextPedigree() {
+
+}
 
 function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand) {
 	this.traitType = traittype;
@@ -65,7 +92,7 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	this.width = 600;
 	this.height = 500;
 
-	var sexlinked = (traittype == pedigree.constants.DOMINANT_SEXLINKED || traittype == pedigree.constants.RECESSIVE_SEXLINKED);
+	var sexlinked = (traittype == pedigree.constant.DOMINANT_SEXLINKED || traittype == pedigree.constant.RECESSIVE_SEXLINKED);
 	var fatherGen2prefered;
 	var motherGen2prefered;
 
@@ -123,47 +150,47 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	// private method
 	function createParentsAutosomal(that, parentType) {
 		switch (parentType) {
-			case pedigree.constants.BB_BB:
+			case pedigree.constant.BB_BB:
 				that.pairing = "BB BB";
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
 				break;
-			case pedigree.constants.BB_Bb:
+			case pedigree.constant.BB_Bb:
 				that.pairing = "BB Bb";
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
 				break;
-			case pedigree.constants.BB_bb:
+			case pedigree.constant.BB_bb:
 				if (Math.random() > 0.5) { // randomly choose whether father or mother is BB
 					that.pairing = "BB bb";
-					that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
-					that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
+					that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
+					that.motherGen1 = new IndividualModel(false, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
 				} else {
 					that.pairing = "bb BB";
-					that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
-					that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
+					that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
+					that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
 				}
 				break;
-			case pedigree.constants.Bb_Bb:
+			case pedigree.constant.Bb_Bb:
 				that.pairing = "Bb Bb";
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
 				break;
-			case pedigree.constants.Bb_bb:
+			case pedigree.constant.Bb_bb:
 				if (Math.random() > 0.5) { // randomly choose whether father or mother is Bb
 					that.pairing = "Bb bb";
-					that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
-					that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
+					that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
+					that.motherGen1 = new IndividualModel(false, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
 				} else {
 					that.pairing = "bb Bb";
-					that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
-					that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
+					that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
+					that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
 				}
 				break;
-			case pedigree.constants.bb_bb:
+			case pedigree.constant.bb_bb:
 				that.pairing = "bb bb";
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
 				break;
 		}
 	}
@@ -171,35 +198,35 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 	// private method
 	function createParentsSexlinked(that, parentType) {
 		switch (parentType) {
-			case pedigree.constants.XBXB_XBy:
+			case pedigree.constant.XBXB_XBy:
 				that.pairing = "XBXB XBy";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.EMPTY);
 				break;
-			case pedigree.constants.XBXB_Xby:
+			case pedigree.constant.XBXB_Xby:
 				that.pairing = "XBXB Xby";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.DOMINANT);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.DOMINANT);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.EMPTY);
 				break;
-			case pedigree.constants.XBXb_XBy:
+			case pedigree.constant.XBXb_XBy:
 				that.pairing = "XBXb XBy";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.EMPTY);
 				break;
-			case pedigree.constants.XBXb_Xby:
+			case pedigree.constant.XBXb_Xby:
 				that.pairing = "XBXb Xby";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.DOMINANT, pedigree.constants.RECESSIVE);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.DOMINANT, pedigree.constant.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.EMPTY);
 				break;
-			case pedigree.constants.XbXb_XBy:
+			case pedigree.constant.XbXb_XBy:
 				that.pairing = "XbXb XBy";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.DOMINANT, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.DOMINANT, pedigree.constant.EMPTY);
 				break;
-			case pedigree.constants.XbXb_Xby:
+			case pedigree.constant.XbXb_Xby:
 				that.pairing = "XbXb Xby";
-				that.motherGen1 = new IndividualModel(false, pedigree.constants.RECESSIVE, pedigree.constants.RECESSIVE);
-				that.fatherGen1 = new IndividualModel(true, pedigree.constants.RECESSIVE, pedigree.constants.EMPTY);
+				that.motherGen1 = new IndividualModel(false, pedigree.constant.RECESSIVE, pedigree.constant.RECESSIVE);
+				that.fatherGen1 = new IndividualModel(true, pedigree.constant.RECESSIVE, pedigree.constant.EMPTY);
 				break;
 		}
 	}
@@ -239,9 +266,9 @@ function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand
 PedigreeModel.prototype.draw = function(canvas) {
 		// debug("draw function");
 
-		var gridX = pedigree.constants.SEPARATION;
-		var gridY = pedigree.constants.SEPARATION*1.5;
-		var headY = pedigree.constants.SEPARATION/2;
+		var gridX = pedigree.constant.SEPARATION;
+		var gridY = pedigree.constant.SEPARATION*1.5;
+		var headY = pedigree.constant.SEPARATION/2;
 
 		var gen1 = this.children.length;
 		var gen2 = this.grandchildren.length;
@@ -271,16 +298,16 @@ PedigreeModel.prototype.draw = function(canvas) {
 		}
 
 		// draw symbols
-		var dominant = (this.traitType == pedigree.constants.DOMINANT_SEXLINKED || this.traitType == pedigree.constants.DOMINANT_AUTOSOMAL);
+		var dominant = (this.traitType == pedigree.constant.DOMINANT_SEXLINKED || this.traitType == pedigree.constant.DOMINANT_AUTOSOMAL);
 		var visible = this.fatherGen1.isTraitVisible(dominant);
-		var fatherGS = new GenderSymbol(gen1Center - gridX / 2, gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, true);
+		var fatherGS = new GenderSymbol(gen1Center - gridX / 2, gridY, pedigree.constant.SYMBOL_SIZE, visible, pedigree.constant.LINE_THICKNESS, true);
 		fatherGS.draw(canvas);
 		visible = this.motherGen1.isTraitVisible(dominant);
-		var motherGS = new GenderSymbol(gen1Center + gridX / 2, gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, false);
+		var motherGS = new GenderSymbol(gen1Center + gridX / 2, gridY, pedigree.constant.SYMBOL_SIZE, visible, pedigree.constant.LINE_THICKNESS, false);
 		motherGS.draw(canvas);
 
 		visible = this.inlaw.isTraitVisible(dominant);
-		var inlawGS = new GenderSymbol(x + gridX, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, this.inlaw.isMale());
+		var inlawGS = new GenderSymbol(x + gridX, 2 * gridY, pedigree.constant.SYMBOL_SIZE, visible, pedigree.constant.LINE_THICKNESS, this.inlaw.isMale());
 		inlawGS.draw(canvas);
 
 		// sort so that the inlaw's mate is at the right end
@@ -292,7 +319,7 @@ PedigreeModel.prototype.draw = function(canvas) {
 		for (var i=0; i<gen1; i++) {
 			x = gen1Center - ((gen1 - 1) * gridX) / 2 + i * gridX;
 			visible = temp[i].isTraitVisible(dominant);
-			child = new GenderSymbol(x, 2 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, temp[i].isMale());
+			child = new GenderSymbol(x, 2 * gridY, pedigree.constant.SYMBOL_SIZE, visible, pedigree.constant.LINE_THICKNESS, temp[i].isMale());
 			child.draw(canvas);
 		}
 
@@ -300,16 +327,16 @@ PedigreeModel.prototype.draw = function(canvas) {
 		for (var i=0; i<gen2; i++) {
 			x2 = gen2Center - ((gen2 - 1) * gridX) / 2 + i * gridX;
 			visible = this.grandchildren[i].isTraitVisible(dominant);
-			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constants.SYMBOL_SIZE, visible, pedigree.constants.LINE_THICKNESS, this.grandchildren[i].isMale());
+			grand = new GenderSymbol(x2, 3 * gridY, pedigree.constant.SYMBOL_SIZE, visible, pedigree.constant.LINE_THICKNESS, this.grandchildren[i].isMale());
 			grand.draw(canvas);
 		}
 }
 
 
 function IndividualModel(m, a1, a2) {
-	if (a1 == pedigree.constants.EMPTY) alert("Invalid arguments sent to function IndividualModel");
-	if (!m && a2 == pedigree.constants.EMPTY) alert("Invalid arguments sent to function IndividualModel");
-	///if (a1 == pedigree.constants.RECESSIVE && a2 == pedigree.constants.DOMINANT) alert("Invalid arguments sent to function IndividualModel");
+	if (a1 == pedigree.constant.EMPTY) alert("Invalid arguments sent to function IndividualModel");
+	if (!m && a2 == pedigree.constant.EMPTY) alert("Invalid arguments sent to function IndividualModel");
+	///if (a1 == pedigree.constant.RECESSIVE && a2 == pedigree.constant.DOMINANT) alert("Invalid arguments sent to function IndividualModel");
 
 	this.male = m;		// false selected for female because of common initial letter
 	this.allele1 = a1;
@@ -325,21 +352,21 @@ IndividualModel.prototype.isTraitVisible = function(isDominant) {
 	// both alleles recessive, or one allele recessive and the other empty
 	if (typeof isDominant === "boolean") {
 		if (isDominant)
-			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) >= 0);
+			return (this.getAllele(pedigree.constant.X_ALLELE)+this.getAllele(pedigree.constant.Y_ALLELE) >= 0);
 		else
-			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) < 0);
+			return (this.getAllele(pedigree.constant.X_ALLELE)+this.getAllele(pedigree.constant.Y_ALLELE) < 0);
 	} else {
-		if (isDominant == pedigree.constants.RECESSIVE)
-			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) < 0);
+		if (isDominant == pedigree.constant.RECESSIVE)
+			return (this.getAllele(pedigree.constant.X_ALLELE)+this.getAllele(pedigree.constant.Y_ALLELE) < 0);
 		else			// dominant
-			return (this.getAllele(pedigree.constants.X_ALLELE)+this.getAllele(pedigree.constants.Y_ALLELE) >= 0);
+			return (this.getAllele(pedigree.constant.X_ALLELE)+this.getAllele(pedigree.constant.Y_ALLELE) >= 0);
 	}
 };
 
 // Gets one of the alleles.  Use this to generate children according to the Punnett Square.
 // @return DOMINANT, EMPTY, OR RECESSIVE
 IndividualModel.prototype.getAllele = function(whichN) {
-	if (whichN == pedigree.constants.X_ALLELE)
+	if (whichN == pedigree.constant.X_ALLELE)
 		return this.allele1;
 	else
 		return this.allele2;
@@ -366,21 +393,21 @@ IndividualModel.prototype.toString = function() {
 	else
 		result += "Female ";
 	switch(this.allele1) {
-		case pedigree.constants.DOMINANT:
+		case pedigree.constant.DOMINANT:
 			result += "Dominant ";
 			break;
-		case pedigree.constants.RECESSIVE:
+		case pedigree.constant.RECESSIVE:
 			result += "Recessive ";
 			break;
 	}
 	switch(this.allele2) {
-		case pedigree.constants.DOMINANT:
+		case pedigree.constant.DOMINANT:
 			result += "Dominant";
 			break;
-		case pedigree.constants.RECESSIVE:
+		case pedigree.constant.RECESSIVE:
 			result += "Recessive";
 			break;
-		case pedigree.constants.EMPTY:
+		case pedigree.constant.EMPTY:
 			result += "Empty";
 	}
 	return result;
@@ -401,7 +428,7 @@ function GenderSymbol(x, y, size, filled, lineW, gender) {
 	this.size = (size > 4) ? size : 5; // radius of circles
 	this.lineWidth = (lineW < 1) ? 1 : parseFloat(lineW);
 	this.gender = gender; // true for male
-	this.fillColor = (filled) ? pedigree.constants.DARK_COLOR : pedigree.constants.LIGHT_COLOR;
+	this.fillColor = (filled) ? pedigree.constant.DARK_COLOR : pedigree.constant.LIGHT_COLOR;
 }
 
 GenderSymbol.prototype.draw = function(canvas) {
@@ -413,7 +440,7 @@ GenderSymbol.prototype.draw = function(canvas) {
 	var l1 = Math.round(this.size * this.c.RADIUS_RATIO);
 	var l2 = Math.round(this.size * this.c.SPREAD_RATIO);
 
-	canvas.defaultStroke(pedigree.constants.DARK_COLOR, pedigree.constants.LINE_THICKNESS);
+	canvas.defaultStroke(pedigree.constant.DARK_COLOR, pedigree.constant.LINE_THICKNESS);
 	
 	// draw the lines that make up the male and female symbols
 	if (this.gender) { // true: male

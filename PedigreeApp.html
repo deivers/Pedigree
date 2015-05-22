@@ -35,12 +35,12 @@
 		</div>
 		<div class="col-sm-6">
 			<p>
-				<a class="btn btn-lg center-block" href="#" role="button">View another pedigree</a>
+				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
 			</p>
 		</div>
 		<div class="col-sm-6 dropdown"> 
 			<div class="btn-group center-block"> <a class="btn btn-lg dropdown-toggle btn-select" data-toggle="dropdown" href="#">Select a trait type <span class="caret"></span></a>
-				<ul class="dropdown-menu">
+				<ul id="traitList" class="dropdown-menu">
 					<li><a href="#">Dominant Autosomal</a></li>
 					<li><a href="#">Recessive Autosomal</a></li>
 					<li><a href="#">Dominant Sex-linked</a></li>
@@ -57,10 +57,13 @@
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="bs/js/bootstrap.min.js"></script>
 		<script>
-			$(".dropdown-menu li a").click(function(){
+			$('#traitList li').on('click', function(){
 				var selText = $(this).text();
+				debug(selText)///////////
 				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+				traitSelected(selText);
 			});
+
 		</script>
 
 	</body>

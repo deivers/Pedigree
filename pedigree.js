@@ -66,13 +66,17 @@ $.getScript("utility.js", function(){
 });
 
 function viewAnother() {
-	alert("viewAnother function");
+	pm.removeDrawing(snapSvgCanvas);
+	pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);
+	pm.draw(snapSvgCanvas);
 }
 
 function traitSelected(selectedText) {
 	if (exists(selectedText)) {
+		pm.removeDrawing(snapSvgCanvas);
 		var traitIndex = pedigree.constant.traitChoices.indexOf();
-		pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);
+		currentTrait = traitIndex;
+		pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);//////////////////////this needs to be randomized
 		pm.draw(snapSvgCanvas);
 	}
 }
@@ -331,6 +335,9 @@ PedigreeModel.prototype.draw = function(canvas) {
 			grand.draw(canvas);
 		}
 }
+PedigreeModel.prototype.removeDrawing = function(canvas) {
+	canvas.clear();
+}
 
 
 function IndividualModel(m, a1, a2) {
@@ -457,6 +464,10 @@ GenderSymbol.prototype.draw = function(canvas) {
 
 var snapSvgCanvas = {
 	snapPaper: null, // set this before calling any functions below
+	clear: function() {
+		this.snapPaper.selectAll('line').remove();
+		this.snapPaper.selectAll('circle').remove();
+	},
 	drawLine: function(x1, y1, x2, y2, strokeWidth) {
 		if (typeof strokeWidth === 'number')
 			return this.snapPaper.line(x1, y1, x2, y2).attr({'stroke-width': strokeWidth});

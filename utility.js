@@ -1,6 +1,6 @@
-
-if (!exists(Mathy))
+if (typeof Mathy === "undefined" || Mathy === null)
 	Mathy = {};
+// not sure why I can't use my exists fn above
 
 /**
  * Returns a boolean that is true some percent of the time
@@ -32,7 +32,7 @@ Mathy.skewedRandomInteger = function(freqArray) {
 		if (r <= (accumulator / sum))
 			return i;
 	}
-		return freqArray.length - 1; // never gets here
+	return freqArray.length - 1; // never gets here
 }
 
 
@@ -53,8 +53,9 @@ String.prototype.contains = function(subString) {
 }
 
 function exists(x) {
-	return (typeof x !== "undefined" && x != null);
+	return (typeof x !== "undefined" && x !== null);
 }
+
 jQuery.fn.exists = function(){
 	return jQuery(this).length>0;
 }

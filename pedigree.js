@@ -1,8 +1,10 @@
 
 var pedigree = {};
-var pm;
-var pedigreeCount = 0, traitCount = 0, teachModeCounter = 0;
-var currentTrait;
+var pm; // pedigree model   //TODO change this to pedigree.model???
+var pedigreeCount = 0, traitCount = 0;
+var currentTrait; //TODO make this a property of pm?
+var answerIndex;
+pedigree.teachModeCounter = 0;
 
 pedigree.constant = {
 	DOMINANT_AUTOSOMAL: 0,
@@ -46,22 +48,29 @@ pedigree.constant = {
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
 	numOffspringLimits: [1, 6, 1, 6],
 
-	teachMode: false	// false means quiz mode
+	teachMode: false,	// false means quiz mode
+	easyMode: true,
+
 };
 
 
 $.getScript("utility.js", function(){
-	debug("\n\n\n");
+	debug("\n\n");
+	// setup the mode
+	if (pedigree.constant.teachMode)
+		$("#task-label").html("Select a trait: ");
+	// 
+	// create snap drawing context (a.k.a paper)
+	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
-	debug(pedigree.constant.SYMBOL_SIZE);
 	currentTrait = pedigree.constant.DOMINANT_SEXLINKED;
-	pm = new PedigreeModel(currentTrait, 3, 3, 5, 2);
+	if (!pedigree.constant.teachMode)
+		nextTrait();
+	nextPedigree(currentTrait);
 	debug(pm);
 	debug("Trait: " + pedigree.constant.traitChoices[currentTrait + 1] + "   First generation: "
 					+ pm.pairing);
 
-	// create snap drawing context (a.k.a paper)
-	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	pm.draw(snapSvgCanvas);
 });
 
@@ -76,13 +85,63 @@ function traitSelected(selectedText) {
 		pm.removeDrawing(snapSvgCanvas);
 		var traitIndex = pedigree.constant.traitChoices.indexOf();
 		currentTrait = traitIndex;
-		pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);//////////////////////this needs to be randomized
-		pm.draw(snapSvgCanvas);
+		nextPedigree(traitIndex);
+	}
+}
+
+function nextTrait() {
+	var prevTrait = currentTrait;
+	currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
+	if (currentTrait === prevTrait) {
+		currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
+		// since one or more of the 4 might have 0 probability (resulting in fewer choices in the pull-down),
+		// figure out the correct answer for the pull-down menu
+		answerIndex = currentTrait;
+		for (var i = currentTrait - 1; i >= 0; i--) {
+			if (pedigree.constant.traitTypeFrequency[i] == 0)
+				answerIndex--;
+		}
+		traitCount++;
+		pedigreeCount = 0;
 	}
 }
 
 function nextPedigree() {
-
+	var pairTypeGen1, pairTypeGen2;
+	if (pedigree.teachMode) {
+		if (currentTrait < 2) { // autosomal
+			pairTypeGen1 = pedigree.teachModeCounter % pedigree.constant.autosomalFrequency.length; // round-robin instead of random
+			pairTypeGen2 = Mathy.skewedRandomInteger(pedigree.constant.autosomalFrequency);
+		} else { // sex-linked
+			pairTypeGen1 = pedigree.teachModeCounter % pedigree.constant.sexlinkedFrequency.length; // round-robin instead of random
+			pairTypeGen2 = Mathy.skewedRandomInteger(pedigree.constant.sexlinkedFrequency);
+		}
+	} else {
+		if (currentTrait < 2) { // autosomal
+			pairTypeGen1 = Mathy.skewedRandomInteger(pedigree.constant.autosomalFrequency);
+			pairTypeGen2 = Mathy.skewedRandomInteger(pedigree.constant.autosomalFrequency);
+		} else { // sex-linked
+			pairTypeGen1 = Mathy.skewedRandomInteger(pedigree.constant.sexlinkedFrequency);
+			pairTypeGen2 = Mathy.skewedRandomInteger(pedigree.constant.sexlinkedFrequency);
+		}
+	}
+	// bias the following randomness toward the higher numbers by using square root of the random number
+	var biasedRand1 = Math.sqrt(Math.random());
+	var biasedRand2 = Math.sqrt(Math.random());
+	var nol = pedigree.constant.numOffspringLimits;
+	var numChild = Math.floor(biasedRand1 * (nol[1] - nol[0] + 1)) + nol[0];
+	var numGrand = Math.floor(biasedRand2 * (nol[3] - nol[2] + 1)) + nol[2];
+	//
+	pm = new PedigreeModel(currentTrait, pairTypeGen1, pairTypeGen2, numChild, numGrand);
+	// if (pedigree.teachMode) { // display the trait type at top
+	// 	traitL.setText("Trait: " + possibleChoices[currentTrait + 1] + "   First generation: "
+	// 			+ pedigree.getPairing());
+	// 	pedigree.teachModeCounter++;
+	// } else { // give student info to help orient
+	// 	pedigreeCount++;
+	// 	traitL.setText("Trait #" + traitCount + "    Pedigree #" + pedigreeCount);
+	// }
+	pm.draw(snapSvgCanvas);
 }
 
 function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand) {

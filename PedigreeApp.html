@@ -39,8 +39,10 @@
 				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
 			</p>
 		</div>
-		<div class="col-sm-6 dropdown"> 
-			<div class="btn-group center-block"> <a class="btn btn-lg dropdown-toggle btn-select" data-toggle="dropdown" href="#">Dominant Autosomal <span class="caret"></span></a>
+		<div class="col-sm-6 dropdown">
+			<div class="btn-group center-block">
+			<span id="task-label">Guess the trait: </span>
+			<a class="btn btn-lg dropdown-toggle btn-select" data-toggle="dropdown" href="#">Dominant Autosomal <span class="caret"></span></a>
 				<ul id="traitList" class="dropdown-menu">
 					<li><a href="#">Dominant Autosomal </a></li>
 					<li><a href="#">Recessive Autosomal </a></li>
@@ -51,11 +53,10 @@
 		</div>
 				
 
-		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<!-- jQuery (necessary for, so must precede, Bootstrap's JavaScript plugins) -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="pedigree.js"></script>
 		<script src="./lib/snap.svg-min.js"></script>
-		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="bs/js/bootstrap.min.js"></script>
 		<script>
 			$('#traitList li').on('click', function(){

@@ -63,33 +63,55 @@ $.getScript("utility.js", function(){
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
-	currentTrait = pedigree.constant.DOMINANT_SEXLINKED;
-	if (!pedigree.constant.teachMode)
+	if (!pedigree.constant.teachMode) {
 		nextTrait();
-	nextPedigree(currentTrait);
-	debug(pm);
-	debug("Trait: " + pedigree.constant.traitChoices[currentTrait + 1] + "   First generation: "
-					+ pm.pairing);
+		nextPedigree(currentTrait);
+		pm.draw(snapSvgCanvas);
+	} else { // teach mode
+		//TODO
+		// initially display prompt to select a trait to get started...
 
-	pm.draw(snapSvgCanvas);
+		
+
+	}
 });
 
-function viewAnother() {
-	pm.removeDrawing(snapSvgCanvas);
-	pm = new PedigreeModel(currentTrait, 3, 3, 5, 1);
-	pm.draw(snapSvgCanvas);
+function updateGuidance() {
+	if (pedigree.constant.teachMode) { // display the trait type at top of applet
+		traitLable.setText("Trait: " + pedigree.constant.traitChoices[currentTrait] + "   First generation: "
+				+ "");
+		pedigree.teachModeCounter++;
+	} else { // give student info to help orient them
+		pedigreeCount++;
+		traitLabel.setText("Trait #" + traitCount + "    Pedigree #" + pedigreeCount);
+	}
+
 }
 
-function traitSelected(selectedText) {
-	if (exists(selectedText)) {
-		pm.removeDrawing(snapSvgCanvas);
-		var traitIndex = pedigree.constant.traitChoices.indexOf();
-		currentTrait = traitIndex;
-		nextPedigree(traitIndex);
+function viewAnother() {
+	nextPedigree();
+}
+
+function traitSelected(selectedTraitIndex) {
+	if (exists(selectedTraitIndex)) {
+		if (!pedigree.constant.teachMode) {
+			// determine if student answer is correct
+			if (selectedTraitIndex === currentTrait) {
+				alert("Correct!  Here's a new trait...");
+				nextTrait();
+			} else {
+				alert("Incorrect.  Please try again.")
+			}
+		} else { // teach mode
+			$("#combo-box").html(pedigree.constant.traitChoices[selectedTraitIndex]);
+			currentTrait = selectedTraitIndex;
+		}
+		nextPedigree(selectedTraitIndex);
 	}
 }
 
 function nextTrait() {
+	// pick the next trait
 	var prevTrait = currentTrait;
 	currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
 	if (currentTrait === prevTrait) {
@@ -133,15 +155,14 @@ function nextPedigree() {
 	var numGrand = Math.floor(biasedRand2 * (nol[3] - nol[2] + 1)) + nol[2];
 	//
 	pm = new PedigreeModel(currentTrait, pairTypeGen1, pairTypeGen2, numChild, numGrand);
-	// if (pedigree.teachMode) { // display the trait type at top
-	// 	traitL.setText("Trait: " + possibleChoices[currentTrait + 1] + "   First generation: "
-	// 			+ pedigree.getPairing());
-	// 	pedigree.teachModeCounter++;
-	// } else { // give student info to help orient
-	// 	pedigreeCount++;
-	// 	traitL.setText("Trait #" + traitCount + "    Pedigree #" + pedigreeCount);
-	// }
+	// updateGuidance();///////////////TODO
+	pm.removeDrawing(snapSvgCanvas);
 	pm.draw(snapSvgCanvas);
+
+
+		debug("Trait: " + pedigree.constant.traitChoices[currentTrait] + "   First generation: "
+						+ pm.pairing);
+
 }
 
 function PedigreeModel(traittype, pairTypeGen1, pairTypeGen2, numChild, numGrand) {

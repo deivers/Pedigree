@@ -31,7 +31,7 @@
 		<h1>Pedigree</h1>
 
 		<div class="well">
-			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=500 height=500 class="center-block">
+			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=700 height=500 class="center-block">
 			</svg>
 		</div>
 		<div class="col-sm-6">
@@ -41,13 +41,12 @@
 		</div>
 		<div class="col-sm-6 dropdown">
 			<div class="btn-group center-block">
-			<span id="task-label">Guess the trait: </span>
-			<a class="btn btn-lg dropdown-toggle btn-select" data-toggle="dropdown" href="#">Dominant Autosomal <span class="caret"></span></a>
+				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">Guess the trait... <span class="caret"></span></a>
 				<ul id="traitList" class="dropdown-menu">
-					<li><a href="#">Dominant Autosomal </a></li>
-					<li><a href="#">Recessive Autosomal </a></li>
-					<li><a href="#">Dominant Sex-linked </a></li>
-					<li><a href="#">Recessive Sex-linked </a></li>
+					<li><a href="#" onclick="traitSelected(0)">Dominant Autosomal </a></li>
+					<li><a href="#" onclick="traitSelected(1)">Recessive Autosomal </a></li>
+					<li><a href="#" onclick="traitSelected(2)">Dominant Sex-linked </a></li>
+					<li><a href="#" onclick="traitSelected(3)">Recessive Sex-linked </a></li>
 				</ul>
 			</div>
 		</div>
@@ -61,9 +60,7 @@
 		<script>
 			$('#traitList li').on('click', function(){
 				var selText = $(this).text();
-				debug(selText)///////////
 				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-				traitSelected(selText);
 			});
 
 		</script>

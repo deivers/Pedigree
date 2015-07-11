@@ -23,9 +23,10 @@
 			margin-right: 30px;
 		}
 		div.center {
-			margin-left: auto;
-			margin-right: auto;
-			width: 30%;
+			left: 50%;
+			margin-right: -50%;
+			transform: translate(-50%, 0);
+			-webkit-transform: translate(-50%, 0);
 		}
 		p.center {
 			text-align: center;
@@ -44,13 +45,8 @@
 			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=700 height=500 class="center-block">
 			</svg>
 		</div>
-		<div class="col-sm-6">
-			<p>
-				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
-			</p>
-		</div>
 		<div class="col-sm-6 dropdown">
-			<div class="btn-group center-block">
+			<div class="btn-group center">
 				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">...<span class="caret"></span></a>
 				<ul id="traitList" class="dropdown-menu">
 					<li><a href="#" onclick="traitSelected(0)">Dominant Autosomal </a></li>
@@ -59,6 +55,11 @@
 					<li><a href="#" onclick="traitSelected(3)">Recessive Sex-linked </a></li>
 				</ul>
 			</div>
+		</div>
+		<div class="col-sm-6">
+			<p>
+				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
+			</p>
 		</div>
 				
 

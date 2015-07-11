@@ -46,7 +46,7 @@ pedigree.constant = {
 	// a list of 6 ratios for Sex-linked frequencies:  XBXB.XBy, XBXB.Xby, XBXb.XBy, XBXb.Xby, XbXb.XBy, XbXb.Xby
 	sexlinkedFrequency: [0.05, 0.15, 0.3, 0.3, 0.15, 0.05],
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
-	numOffspringLimits: [1, 6, 1, 6],
+	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
 	teachMode: false,	// false means quiz mode
 	easyMode: true,
@@ -57,9 +57,11 @@ pedigree.constant = {
 $.getScript("utility.js", function(){
 	debug("\n\n");
 	// setup the mode
-	if (pedigree.constant.teachMode)
-		$("#task-label").html("Select a trait: ");
-	// 
+	if (pedigree.constant.teachMode) {
+		$("#combo-box").html("Select a trait: ");
+	} else {
+		$("#combo-box").html("Guess the trait:");
+	}
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
@@ -76,16 +78,16 @@ $.getScript("utility.js", function(){
 	}
 });
 
-function updateGuidance() {
+function updateInfoLabel(pedigreeModel) {
+	var text;
 	if (pedigree.constant.teachMode) { // display the trait type at top of applet
-		traitLable.setText("Trait: " + pedigree.constant.traitChoices[currentTrait] + "   First generation: "
-				+ "");
+		text = "Trait: " + pedigree.constant.traitChoices[currentTrait] + "<br>First generation: " +pedigreeModel.pairing;
 		pedigree.teachModeCounter++;
 	} else { // give student info to help orient them
 		pedigreeCount++;
-		traitLabel.setText("Trait #" + traitCount + "    Pedigree #" + pedigreeCount);
+		text = "Trait #" + traitCount + "<br>Pedigree #" + pedigreeCount;
 	}
-
+	$("#info-label").html(text);
 }
 
 function viewAnother() {
@@ -155,7 +157,7 @@ function nextPedigree() {
 	var numGrand = Math.floor(biasedRand2 * (nol[3] - nol[2] + 1)) + nol[2];
 	//
 	pm = new PedigreeModel(currentTrait, pairTypeGen1, pairTypeGen2, numChild, numGrand);
-	// updateGuidance();///////////////TODO
+	updateInfoLabel(pm);
 	pm.removeDrawing(snapSvgCanvas);
 	pm.draw(snapSvgCanvas);
 
@@ -357,7 +359,7 @@ PedigreeModel.prototype.draw = function(canvas) {
 		var gen1 = this.children.length;
 		var gen2 = this.grandchildren.length;
 
-		var gen1Center = Math.floor(0.4 * canvas.getSize().width);
+		var gen1Center = Math.floor(0.45 * canvas.getSize().width);
 
 		// draw father/mother pairing T
 		canvas.drawLine(gen1Center - gridX / 2, gridY, gen1Center + gridX / 2, gridY, 1);

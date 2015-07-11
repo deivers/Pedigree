@@ -18,12 +18,20 @@
 		<![endif]-->
 
 	<style>
-		.dropdown-toggle {
-			left: 30%;
-		}
 		body {
 			margin-left: 30px;
 			margin-right: 30px;
+		}
+		div.center {
+			margin-left: auto;
+			margin-right: auto;
+			width: 30%;
+		}
+		p.center {
+			text-align: center;
+		}
+		.dropdown-toggle {
+			left: 30%;
 		}
 	</style>
 	</head>
@@ -31,6 +39,8 @@
 		<h1>Pedigree</h1>
 
 		<div class="well">
+			<p id="info-label" class="center">
+			</p>
 			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=700 height=500 class="center-block">
 			</svg>
 		</div>
@@ -41,7 +51,7 @@
 		</div>
 		<div class="col-sm-6 dropdown">
 			<div class="btn-group center-block">
-				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">Guess the trait... <span class="caret"></span></a>
+				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">...<span class="caret"></span></a>
 				<ul id="traitList" class="dropdown-menu">
 					<li><a href="#" onclick="traitSelected(0)">Dominant Autosomal </a></li>
 					<li><a href="#" onclick="traitSelected(1)">Recessive Autosomal </a></li>

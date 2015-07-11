@@ -48,7 +48,7 @@ pedigree.constant = {
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
 	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
-	teachMode: false,	// false means quiz mode
+	teachMode: true,	// false means quiz mode
 	easyMode: true,
 
 };
@@ -70,11 +70,7 @@ $.getScript("utility.js", function(){
 		nextPedigree(currentTrait);
 		pm.draw(snapSvgCanvas);
 	} else { // teach mode
-		//TODO
-		// initially display prompt to select a trait to get started...
-
-		
-
+		$("#info-label").html("Select a trait to get started...");
 	}
 });
 

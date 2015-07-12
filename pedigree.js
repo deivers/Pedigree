@@ -11,6 +11,9 @@ pedigree.constant = {
 	RECESSIVE_AUTOSOMAL: 1,
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
+	easyModeIndex: 0,
+	easyMode: true,
+	teachMode: false,	// false means quiz mode
 	traitChoices: ["Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"],
 	// graphic parameters
 	SYMBOL_SIZE: 16,
@@ -46,10 +49,7 @@ pedigree.constant = {
 	// a list of 6 ratios for Sex-linked frequencies:  XBXB.XBy, XBXB.Xby, XBXb.XBy, XBXb.Xby, XbXb.XBy, XbXb.Xby
 	sexlinkedFrequency: [0.05, 0.15, 0.3, 0.3, 0.15, 0.05],
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
-	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
-
-	teachMode: true,	// false means quiz mode
-	easyMode: true,
+	numOffspringLimits: [2, 5, 2, 5] // the actual will be a random integer between these with a bias toward higher values
 
 };
 
@@ -65,12 +65,12 @@ $.getScript("utility.js", function(){
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
-	if (!pedigree.constant.teachMode) {
+	if (pedigree.constant.teachMode) {
+		$("#info-label").html("Select a trait to get started...");
+	} else { // quiz mode
 		nextTrait();
 		nextPedigree(currentTrait);
 		pm.draw(snapSvgCanvas);
-	} else { // teach mode
-		$("#info-label").html("Select a trait to get started...");
 	}
 });
 

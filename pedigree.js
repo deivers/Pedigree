@@ -112,18 +112,17 @@ function nextTrait() {
 	// pick the next trait
 	var prevTrait = currentTrait;
 	currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
-	if (currentTrait === prevTrait) {
+	if (currentTrait === prevTrait)
 		currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
-		// since one or more of the 4 might have 0 probability (resulting in fewer choices in the pull-down),
-		// figure out the correct answer for the pull-down menu
-		answerIndex = currentTrait;
-		for (var i = currentTrait - 1; i >= 0; i--) {
-			if (pedigree.constant.traitTypeFrequency[i] == 0)
-				answerIndex--;
-		}
-		traitCount++;
-		pedigreeCount = 0;
+	// since one or more of the 4 might have 0 probability (resulting in fewer choices in the pull-down),
+	// figure out the correct answer for the pull-down menu
+	answerIndex = currentTrait;
+	for (var i = currentTrait - 1; i >= 0; i--) {
+		if (pedigree.constant.traitTypeFrequency[i] == 0)
+			answerIndex--;
 	}
+	traitCount++;
+	pedigreeCount = 0;
 }
 
 function nextPedigree() {

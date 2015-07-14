@@ -4,6 +4,7 @@ var pm; // pedigree model   //TODO change this to pedigree.model???
 var pedigreeCount = 0, traitCount = 0;
 var currentTrait; //TODO make this a property of pm?
 var answerIndex;
+pedigree.easyModeIndex;
 pedigree.teachModeCounter = 0;
 
 pedigree.constant = {
@@ -11,9 +12,6 @@ pedigree.constant = {
 	RECESSIVE_AUTOSOMAL: 1,
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
-	easyModeIndex: 0,
-	easyMode: true,
-	teachMode: false,	// false means quiz mode
 	traitChoices: ["Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"],
 	// graphic parameters
 	SYMBOL_SIZE: 16,
@@ -49,8 +47,16 @@ pedigree.constant = {
 	// a list of 6 ratios for Sex-linked frequencies:  XBXB.XBy, XBXB.Xby, XBXb.XBy, XBXb.Xby, XbXb.XBy, XbXb.Xby
 	sexlinkedFrequency: [0.05, 0.15, 0.3, 0.3, 0.15, 0.05],
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
-	numOffspringLimits: [2, 5, 2, 5] // the actual will be a random integer between these with a bias toward higher values
+	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
+	easyModeQuestions: [
+		"This trait is autosomal.  Your task is to determine whether its dominant or recessive.",
+		"This trait is sex-linked.  Your task is to determine whether its dominant or recessive.",
+		"This trait is dominant.  Your task is to determine whether its autosomal or sex-linked.",
+		"This trait is recessive.  Your task is to determine whether its autosomal or sex-linked."
+	],
+	easyMode: true,
+	teachMode: false	// false means quiz mode
 };
 
 
@@ -79,6 +85,8 @@ function updateInfoLabel(pedigreeModel) {
 	if (pedigree.constant.teachMode) { // display the trait type at top of applet
 		text = "Trait: " + pedigree.constant.traitChoices[currentTrait] + "<br>First generation: " +pedigreeModel.pairing;
 		pedigree.teachModeCounter++;
+	} else if (pedigree.constant.easyMode) {
+		text = pedigree.constant.easyModeQuestions[pedigree.easyModeIndex];
 	} else { // give student info to help orient them
 		pedigreeCount++;
 		text = "Trait #" + traitCount + "<br>Pedigree #" + pedigreeCount;
@@ -109,11 +117,17 @@ function traitSelected(selectedTraitIndex) {
 }
 
 function nextTrait() {
-	// pick the next trait
+	// pick the next trait, depending on the mode
 	var prevTrait = currentTrait;
-	currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
-	if (currentTrait === prevTrait)
+	if (pedigree.constant.easyMode) {
+		pedigree.easyModeIndex = Math.floor(Math.random() * 4);
+		currentTrait = [[0,1], [2,3], [0,2], [1,3]][pedigree.easyModeIndex].randomElement();
+		updateInfoLabel();
+	} else {
 		currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
+		if (currentTrait === prevTrait)
+			currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
+	}
 	// since one or more of the 4 might have 0 probability (resulting in fewer choices in the pull-down),
 	// figure out the correct answer for the pull-down menu
 	answerIndex = currentTrait;

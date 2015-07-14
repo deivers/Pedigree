@@ -64,6 +64,10 @@ Array.prototype.max = function() {
  return Math.max.apply(null, this);
 };
 
+Array.prototype.randomElement = function() {
+	return this[Math.floor(Math.random()*this.length)];
+};
+
 function shuffleArray(array) {
 	// Randomize order in-place using Fisher-Yates shuffle algorithm
 	for (var i = array.length - 1; i > 0; i--) {

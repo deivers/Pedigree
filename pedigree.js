@@ -60,7 +60,6 @@ pedigree.constant = {
 
 
 $.getScript("utility.js", function(){
-	debug("\n\n");
 	// get the mode from the html
 	var modeStringFromHtml = $("#pedigree").data("mode");
 	pedigree.constant.teachMode = (modeStringFromHtml === "teach");
@@ -173,9 +172,7 @@ function nextPedigree() {
 	pm.removeDrawing(snapSvgCanvas);
 	pm.draw(snapSvgCanvas);
 
-
-		debug("Trait: " + pedigree.constant.traitChoices[currentTrait] + "   First generation: "
-						+ pm.pairing);
+	// debug("Trait: " + pedigree.constant.traitChoices[currentTrait] + "   First generation: " + pm.pairing);
 
 }
 

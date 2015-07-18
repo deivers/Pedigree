@@ -50,18 +50,21 @@ pedigree.constant = {
 	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
 	easyModeQuestions: [
-	],
-	easyMode: true,
-	teachMode: false	// false means quiz mode
 		"This trait is autosomal.  Your task is to determine whether it is dominant or recessive.",
 		"This trait is sex-linked.  Your task is to determine whether it is dominant or recessive.",
 		"This trait is dominant.  Your task is to determine whether it is autosomal or sex-linked.",
 		"This trait is recessive.  Your task is to determine whether it is autosomal or sex-linked."
+	]
+	// later added: easyMode and teachMode
 };
 
 
 $.getScript("utility.js", function(){
 	debug("\n\n");
+	// get the mode from the html
+	var modeStringFromHtml = $("#pedigree").data("mode");
+	pedigree.constant.teachMode = (modeStringFromHtml === "teach");
+	pedigree.constant.easyMode = (modeStringFromHtml === "easy");
 	// setup the mode
 	if (pedigree.constant.teachMode) {
 		$("#combo-box").html("Select a trait: ");

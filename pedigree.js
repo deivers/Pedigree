@@ -50,13 +50,13 @@ pedigree.constant = {
 	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
 	easyModeQuestions: [
-		"This trait is autosomal.  Your task is to determine whether its dominant or recessive.",
-		"This trait is sex-linked.  Your task is to determine whether its dominant or recessive.",
-		"This trait is dominant.  Your task is to determine whether its autosomal or sex-linked.",
-		"This trait is recessive.  Your task is to determine whether its autosomal or sex-linked."
 	],
 	easyMode: true,
 	teachMode: false	// false means quiz mode
+		"This trait is autosomal.  Your task is to determine whether it is dominant or recessive.",
+		"This trait is sex-linked.  Your task is to determine whether it is dominant or recessive.",
+		"This trait is dominant.  Your task is to determine whether it is autosomal or sex-linked.",
+		"This trait is recessive.  Your task is to determine whether it is autosomal or sex-linked."
 };
 
 

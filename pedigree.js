@@ -67,9 +67,9 @@ $.getScript("utility.js", function(){
 	pedigree.constant.easyMode = (modeStringFromHtml === "easy");
 	// setup the mode
 	if (pedigree.constant.teachMode) {
-		$("#combo-box").html("Select a trait: ");
+		$("#combo-box").html("Select a trait: &#x25BC;");
 	} else {
-		$("#combo-box").html("Guess the trait:");
+		$("#combo-box").html("Guess the trait: &#x25BC;");
 	}
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();

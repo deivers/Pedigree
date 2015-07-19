@@ -34,6 +34,9 @@
 		.dropdown-toggle {
 			left: 30%;
 		}
+		a:hover {
+			background-color: #ddd !important;
+		}
 	</style>
 	</head>
 	<body>
@@ -44,6 +47,13 @@
 			</p>
 			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=700 height=500 class="center-block">
 			</svg>
+		</div>
+		<div class="col-sm-6">
+			<div class="text-center">
+				<span class="center-block">
+					<a class="btn btn-lg" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
+				</span>
+			</div>
 		</div>
 		<div class="col-sm-6 dropdown">
 			<div class="btn-group center">
@@ -56,12 +66,7 @@
 				</ul>
 			</div>
 		</div>
-		<div class="col-sm-6">
-			<p>
-				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
-			</p>
-		</div>
-				
+
 
 		<!-- jQuery (necessary for, so must precede, Bootstrap's JavaScript plugins) -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>

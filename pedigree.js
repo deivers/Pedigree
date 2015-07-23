@@ -2,7 +2,7 @@
 var pedigree = {};
 var pm; // pedigree model   //TODO change this to pedigree.model???
 var pedigreeCount = 0, traitCount = 0;
-var currentTrait; //TODO make this a property of pm?
+var currentTrait = -1; //TODO make this a property of pm?
 var answerIndex;
 pedigree.easyModeIndex;
 pedigree.teachModeCounter = 0;
@@ -70,13 +70,13 @@ $.getScript("utility.js", function(){
 		$("#combo-box").html("Select a trait: &#x25BC;");
 	} else {
 		$("#combo-box").html("Choose the correct trait: &#x25BC;");
+		$("#show-details-checkbox").remove();
 	}
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
 	if (pedigree.constant.teachMode) {
 		$("#info-label").html("Select a trait to get started...");
-		$("#trait-list")
 		updateDropdownMenu();
 	} else { // quiz mode
 		nextTrait();
@@ -88,7 +88,9 @@ $.getScript("utility.js", function(){
 function updateInfoLabel(pedigreeModel) {
 	var text;
 	if (pedigree.constant.teachMode) { // display the trait type at top of applet
-		text = "Trait: " + pedigree.constant.traitChoices[currentTrait] + "<br>First generation: " +pedigreeModel.pairing;
+		text = "Trait: " + pedigree.constant.traitChoices[currentTrait];
+		if ($("#show-details-checkbox").is(":checked"))
+			text += "<br>First generation: " +pedigreeModel.pairing;
 		pedigree.teachModeCounter++;
 	} else if (pedigree.constant.easyMode) {
 		text = pedigree.constant.easyModeQuestions[pedigree.easyModeIndex];
@@ -117,7 +119,10 @@ function updateDropdownMenu() {
 }
 
 function viewAnother() {
-	nextPedigree();
+	if (currentTrait === -1) // teach mode and no trait chosen yet
+		alert("Select a trait first.");
+	else
+		nextPedigree();
 }
 
 function traitSelected(selectedTraitIndex) {
@@ -136,6 +141,11 @@ function traitSelected(selectedTraitIndex) {
 		}
 		nextPedigree(selectedTraitIndex);
 	}
+}
+
+function showDetailsCheckboxHandler() {
+	if (currentTrait !== -1)
+		updateInfoLabel(pm);
 }
 
 function nextTrait() {

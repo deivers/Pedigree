@@ -30,6 +30,7 @@
 		}
 		p.center {
 			text-align: center;
+			height: 40px;
 		}
 		#info-label {
 			font-size: 17px;
@@ -39,6 +40,12 @@
 		}
 		a:hover {
 			background-color: #ddd !important;
+		}
+		.footer {
+			position: fixed;
+			bottom: 30px;
+			left: 50%;
+			margin-left: -50px;
 		}
 	</style>
 	</head>
@@ -64,6 +71,9 @@
 				<ul id="trait-list" class="dropdown-menu">
 				</ul>
 			</div>
+		</div>
+		<div class='footer'>
+			<input type='checkbox' id='show-details-checkbox' onclick="showDetailsCheckboxHandler()">Show details
 		</div>
 
 

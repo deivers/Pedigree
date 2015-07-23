@@ -68,13 +68,14 @@ $.getScript("utility.js", function(){
 	if (pedigree.constant.teachMode) {
 		$("#combo-box").html("Select a trait: &#x25BC;");
 	} else {
-		$("#combo-box").html("Guess the trait: &#x25BC;");
+		$("#combo-box").html("Choose the correct trait: &#x25BC;");
 	}
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
 	if (pedigree.constant.teachMode) {
 		$("#info-label").html("Select a trait to get started...");
+		$("#trait-list")
 	} else { // quiz mode
 		nextTrait();
 		nextPedigree(currentTrait);

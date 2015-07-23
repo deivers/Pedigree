@@ -48,7 +48,7 @@ pedigree.constant = {
 	// a list of 6 ratios for Sex-linked frequencies:  XBXB.XBy, XBXB.Xby, XBXb.XBy, XBXb.Xby, XbXb.XBy, XbXb.Xby
 	sexlinkedFrequency: [0.05, 0.15, 0.3, 0.3, 0.15, 0.05],
 	// a list of 4 integers for min & max number of first gen. offspring and min & max number of second gen. offspring
-	numOffspringLimits: [2, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
+	numOffspringLimits: [3, 5, 2, 5], // the actual will be a random integer between these with a bias toward higher values
 
 	easyModeQuestions: [
 		"This trait is autosomal.  Your task is to determine whether it is dominant or recessive.",
@@ -77,6 +77,7 @@ $.getScript("utility.js", function(){
 	if (pedigree.constant.teachMode) {
 		$("#info-label").html("Select a trait to get started...");
 		$("#trait-list")
+		updateDropdownMenu();
 	} else { // quiz mode
 		nextTrait();
 		nextPedigree(currentTrait);

@@ -31,50 +31,47 @@
 		p.center {
 			text-align: center;
 		}
+		#info-label {
+			font-size: 17px;
+		}
 		.dropdown-toggle {
 			left: 30%;
+		}
+		a:hover {
+			background-color: #ddd !important;
 		}
 	</style>
 	</head>
 	<body>
 		<h1>Pedigree</h1>
 
-		<div id="pedigree" data-mode="teach"> <!-- the options are "teach", "easy", and "normal" -->
+		<div id="pedigree" data-mode="easy"> <!-- the options are "teach", "easy", and "normal" -->
 			<p id="info-label" class="center">
 			</p>
 			<svg id='canvas' version="1.1" xmlns="http://www.w3.org/2000/svg" width=700 height=500 class="center-block">
 			</svg>
 		</div>
+		<div class="col-sm-6">
+			<div class="text-center">
+				<span class="center-block">
+					<a class="btn btn-lg" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
+				</span>
+			</div>
+		</div>
 		<div class="col-sm-6 dropdown">
 			<div class="btn-group center">
 				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">...<span class="caret"></span></a>
-				<ul id="traitList" class="dropdown-menu">
-					<li><a href="#" onclick="traitSelected(0)">Dominant Autosomal </a></li>
-					<li><a href="#" onclick="traitSelected(1)">Recessive Autosomal </a></li>
-					<li><a href="#" onclick="traitSelected(2)">Dominant Sex-linked </a></li>
-					<li><a href="#" onclick="traitSelected(3)">Recessive Sex-linked </a></li>
+				<ul id="trait-list" class="dropdown-menu">
 				</ul>
 			</div>
 		</div>
-		<div class="col-sm-6">
-			<p>
-				<a class="btn btn-lg center-block" href="#" role="button" onclick="viewAnother()">View another pedigree</a>
-			</p>
-		</div>
-				
+
 
 		<!-- jQuery (necessary for, so must precede, Bootstrap's JavaScript plugins) -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="pedigree.js"></script>
 		<script src="./lib/snap.svg-min.js"></script>
 		<script src="bs/js/bootstrap.min.js"></script>
-		<script>
-			$('#traitList li').on('click', function(){
-				var selText = $(this).text();
-				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-			});
-
-		</script>
 
 	</body>
 </html>

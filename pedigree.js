@@ -70,7 +70,7 @@ $.getScript("utility.js", function(){
 		$("#combo-box").html("Select a trait: &#x25BC;");
 	} else {
 		$("#combo-box").html("Choose the correct trait: &#x25BC;");
-		$("#show-details-checkbox").remove();
+		$(".footer").remove();
 	}
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();

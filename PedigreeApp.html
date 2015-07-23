@@ -61,11 +61,7 @@
 		<div class="col-sm-6 dropdown">
 			<div class="btn-group center">
 				<a id="combo-box" class="btn btn-lg btn-select" data-toggle="dropdown" href="#">...<span class="caret"></span></a>
-				<ul id="traitList" class="dropdown-menu">
-					<li><a href="#" onclick="traitSelected(0)">Dominant Autosomal </a></li>
-					<li><a href="#" onclick="traitSelected(1)">Recessive Autosomal </a></li>
-					<li><a href="#" onclick="traitSelected(2)">Dominant Sex-linked </a></li>
-					<li><a href="#" onclick="traitSelected(3)">Recessive Sex-linked </a></li>
+				<ul id="trait-list" class="dropdown-menu">
 				</ul>
 			</div>
 		</div>
@@ -76,13 +72,6 @@
 		<script src="pedigree.js"></script>
 		<script src="./lib/snap.svg-min.js"></script>
 		<script src="bs/js/bootstrap.min.js"></script>
-		<script>
-			$('#traitList li').on('click', function(){
-				var selText = $(this).text();
-				$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-			});
-
-		</script>
 
 	</body>
 </html>

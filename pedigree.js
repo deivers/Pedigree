@@ -13,6 +13,7 @@ pedigree.constant = {
 	DOMINANT_SEXLINKED: 2,
 	RECESSIVE_SEXLINKED: 3,
 	traitChoices: ["Dominant Autosomal", "Recessive Autosomal", "Dominant Sex-linked", "Recessive Sex-linked"],
+	traitChoicesForThisMode: [],
 	// graphic parameters
 	SYMBOL_SIZE: 16,
 	SEPARATION: 72,
@@ -97,6 +98,23 @@ function updateInfoLabel(pedigreeModel) {
 	$("#info-label").html(text);
 }
 
+function updateDropdownMenu() {
+	$('#trait-list').empty();
+	if (!pedigree.constant.easyMode || pedigree.easyModeIndex == 0 || pedigree.easyModeIndex == 2)
+		$('#trait-list').append("<li><a href='#' onclick='traitSelected(0)'>Dominant Autosomal </a></li>");
+	if (!pedigree.constant.easyMode || pedigree.easyModeIndex == 0 || pedigree.easyModeIndex == 3)
+		$('#trait-list').append('<li><a href="#" onclick="traitSelected(1)">Recessive Autosomal </a></li>');
+	if (!pedigree.constant.easyMode || pedigree.easyModeIndex == 1 || pedigree.easyModeIndex == 2)
+		$('#trait-list').append('<li><a href="#" onclick="traitSelected(2)">Dominant Sex-linked </a></li>');
+	if (!pedigree.constant.easyMode || pedigree.easyModeIndex == 1 || pedigree.easyModeIndex == 3)
+		$('#trait-list').append('<li><a href="#" onclick="traitSelected(3)">Recessive Sex-linked </a></li>');
+
+	$('#trait-list li').on('click', function(){
+		var selText = $(this).text();
+		$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+	});
+}
+
 function viewAnother() {
 	nextPedigree();
 }
@@ -131,6 +149,7 @@ function nextTrait() {
 		if (currentTrait === prevTrait)
 			currentTrait = Mathy.skewedRandomInteger(pedigree.constant.traitTypeFrequency);
 	}
+	updateDropdownMenu();
 	// since one or more of the 4 might have 0 probability (resulting in fewer choices in the pull-down),
 	// figure out the correct answer for the pull-down menu
 	answerIndex = currentTrait;

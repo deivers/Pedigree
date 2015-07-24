@@ -68,9 +68,10 @@ $.getScript("utility.js", function(){
 	// setup the mode
 	if (pedigree.constant.teachMode) {
 		$("#combo-box").html("Select a trait: &#x25BC;");
+		$("body").append("<div class='show-details'><input type='checkbox' id='show-details-checkbox' onclick='showDetailsCheckboxHandler()'> Reveal first generation details</div>")
 	} else {
 		$("#combo-box").html("Choose the correct trait: &#x25BC;");
-		$(".footer").remove();
+		$(".show-details").remove();
 	}
 	$("body").append(showMetaInfo("1.0 August 2015", true));
 	// create snap drawing context (a.k.a paper)

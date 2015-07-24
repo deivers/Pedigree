@@ -72,6 +72,7 @@ $.getScript("utility.js", function(){
 		$("#combo-box").html("Choose the correct trait: &#x25BC;");
 		$(".footer").remove();
 	}
+	$("body").append(showMetaInfo("1.0 August 2015", true));
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
@@ -614,5 +615,30 @@ var snapSvgCanvas = {
 			height: $("#canvas").height()
 		};
 	}
+}
+
+function showMetaInfo(versionString, ncsuFlag) {
+	var copyrightText = "Copyright 2015";
+	var createdByText = "";
+	var versionText = "Version "+versionString+".";
+	var centerNode = $("<div style='text-align: center; margin-top: 20px'></div>");
+	centerNode.append($("<span></span>").text(copyrightText+" "));
+	if (ncsuFlag) {
+		centerNode.append($("<a href='http://harvest.cals.ncsu.edu' target='_blank'></a>").text("North Carolina State University"));
+		centerNode.append(" &nbsp; Code by ");
+	}
+	centerNode.append($("<a href='http://www.onetimesoftware.com' target='_blank'></a>").text("One Time Software"));
+	centerNode.append(". &nbsp; "+versionText);
+	centerNode.append("<br>");
+	centerNode.append($("<span></span>").text("Free for academic use when displaying this notice."));
+	centerNode.css({
+		color: "gray",
+		"font-size": "x-small",
+		"position": "fixed",
+		"bottom": "20px",
+		"left": "50%",
+		"margin-left": ncsuFlag ? "-275px" : "-150px"
+	});
+	return centerNode;
 }
 

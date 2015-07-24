@@ -638,7 +638,7 @@ function showMetaInfo(versionString, ncsuFlag) {
 		"position": "fixed",
 		"bottom": "20px",
 		"left": "50%",
-		"margin-left": ncsuFlag ? "-275px" : "-150px"
+		"margin-left": ncsuFlag ? "-275px" : "-160px"
 	});
 	return centerNode;
 }

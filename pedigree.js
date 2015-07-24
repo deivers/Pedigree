@@ -73,7 +73,7 @@ $.getScript("utility.js", function(){
 		$("#combo-box").html("Choose the correct trait: &#x25BC;");
 		$(".show-details").remove();
 	}
-	$("body").append(showMetaInfo("1.0 August 2015", true));
+	$("body").append(showMetaInfo("2.0 August 2015", true));
 	// create snap drawing context (a.k.a paper)
 	snapSvgCanvas.snapPaper = Snap("#canvas").group();
 	// run it
